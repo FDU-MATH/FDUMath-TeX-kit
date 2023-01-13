@@ -1,0 +1,111 @@
+%%
+%% This is file `fdumath.ins',
+%%
+%% The original source files were:
+%%     fdumath.dtx  (with options: `install')
+%% 
+%% Copyright (C) 2022--2023
+%%     School of Mathematical Sciences, Fudan University <fdumath4github@gmail.com>
+%%     and any individual authors listed in the documentation.
+%% 
+%% ---------------------------------------------------------------------
+%% 
+%%     This work may be distributed and/or modified under the
+%%     conditions of the LaTeX Project Public License, either
+%%     version 1.3c of this license or (at your option) any later
+%%     version. This version of this license is in
+%%        http://www.latex-project.org/lppl/lppl-1-3c.txt
+%%     and the latest version of this license is in
+%%        http://www.latex-project.org/lppl.txt
+%%     and version 1.3 or later is part of all distributions of
+%%     LaTeX version 2005/12/01 or later.
+%% 
+%%     This work has the LPPL maintenance status "maintained".
+%% 
+%% ---------------------------------------------------------------------
+%% 
+
+\input docstrip %
+
+\preamble
+
+    Copyright (C) 2022--2023
+    School of Mathematical Sciences, Fudan University <fdumath4github@gmail.com>
+    and any individual authors listed in the documentation.
+---------------------------------------------------------------------
+
+    This work may be distributed and/or modified under the
+    conditions of the LaTeX Project Public License, either
+    version 1.3c of this license or (at your option) any later
+    version. This version of this license is in
+       http://www.latex-project.org/lppl/lppl-1-3c.txt
+    and the latest version of this license is in
+       http://www.latex-project.org/lppl.txt
+    and version 1.3 or later is part of all distributions of
+    LaTeX version 2005/12/01 or later.
+
+    This work has the LPPL maintenance status "maintained".
+
+---------------------------------------------------------------------
+
+\endpreamble
+\postamble
+
+    This package consists of the files fdumath.dtx,
+                 and the derived files fdumath.ins,
+                                       fdumath-article.cls,
+                                       fdumath-exercise.cls,
+                                       fdumath-assignment.cls,
+                                       fdumath-exam.cls,
+                                       fdumath-thesis.cls,
+                                       fdumath-book.cls,
+                                       fdumath-report.cls,
+                                       fdumath-beamer.cls, and
+                                       README.md.
+\endpostamble
+
+\generate
+  {
+    \usedir{tex/latex/fdumath}
+        \file{fdumath-article.cls}             {\from{\jobname.dtx}{class,article}}
+        \file{fdumath-exercise.cls}            {\from{\jobname.dtx}{class,article}}
+        \file{fdumath-assignment.cls}          {\from{\jobname.dtx}{class,article}}
+        \file{fdumath-exam.cls}                {\from{\jobname.dtx}{class,article}}
+        \file{fdumath-thesis.cls}              {\from{\jobname.dtx}{class,article}}
+        \file{fdumath-book.cls}                {\from{\jobname.dtx}{class,book}}
+        \file{fdumath-report.cls}              {\from{\jobname.dtx}{class,report}}
+        \file{fdumath-beamer.cls}              {\from{\jobname.dtx}{class,beamer}}
+    \usedir{doc/latex/fdumath}
+    \nopreamble\nopostamble
+        \file{README.md}                       {\from{\jobname.dtx}{readme}}
+  }
+
+
+\obeyspaces
+\Msg{*************************************************************}
+\Msg{*                                                           *}
+\Msg{* To finish the installation you have to move the following *}
+\Msg{* file into proper directories searched by TeX:             *}
+\Msg{*                                                           *}
+\Msg{* The recommended directory is TDS:tex/latex/fdumath        *}
+\Msg{*                                                           *}
+\Msg{*     fdumath-article.cls                                   *}
+\Msg{*     fdumath-exercise.cls                                  *}
+\Msg{*     fdumath-assignment.cls                                *}
+\Msg{*     fdumath-exam.cls                                      *}
+\Msg{*     fdumath-thesis.cls                                    *}
+\Msg{*     fdumath-book.cls                                      *}
+\Msg{*     fdumath-report.cls                                    *}
+\Msg{*     fdumath-beamer.cls                                    *}
+\Msg{*                                                           *}
+\Msg{* To produce the documentation run the file fdumath.dtx     *}
+\Msg{* through XeLaTeX.                                          *}
+\Msg{*                                                           *}
+\Msg{* Happy TeXing!                                             *}
+\Msg{*                                                           *}
+\Msg{*************************************************************}
+
+\endbatchfile
+%% 
+%%
+%% End of file `fdumath.ins'.
