@@ -5,7 +5,8 @@
 %%     fdumath.dtx  (with options: `install')
 %% 
 %% Copyright (C) 2022--2023
-%%     School of Mathematical Sciences, Fudan University <fdumath4github@gmail.com>
+%%     School of Mathematical Sciences, Fudan University,
+%%     Shanghai Center for Mathematical Sciences, Fudan University,
 %%     and any individual authors listed in the documentation.
 %% 
 %% ---------------------------------------------------------------------
@@ -25,12 +26,14 @@
 %% ---------------------------------------------------------------------
 %% 
 
-\input docstrip %
+\input ctxdocstrip %
+\keepsilent
 
 \preamble
 
     Copyright (C) 2022--2023
-    School of Mathematical Sciences, Fudan University <fdumath4github@gmail.com>
+    School of Mathematical Sciences, Fudan University,
+    Shanghai Center for Mathematical Sciences, Fudan University,
     and any individual authors listed in the documentation.
 ---------------------------------------------------------------------
 
@@ -68,20 +71,20 @@
   {
     \usedir{tex/latex/fdumath}
         \file{fdumath-article.cls}             {\from{\jobname.dtx}{class,article}}
-        \file{fdumath-exercise.cls}            {\from{\jobname.dtx}{class,article}}
-        \file{fdumath-assignment.cls}          {\from{\jobname.dtx}{class,article}}
-        \file{fdumath-exam.cls}                {\from{\jobname.dtx}{class,article}}
-        \file{fdumath-thesis.cls}              {\from{\jobname.dtx}{class,article}}
-        \file{fdumath-book.cls}                {\from{\jobname.dtx}{class,book}}
-        \file{fdumath-report.cls}              {\from{\jobname.dtx}{class,report}}
-        \file{fdumath-beamer.cls}              {\from{\jobname.dtx}{class,beamer}}
+        % \file{fdumath-exercise.cls}            {\from{\jobname.dtx}{class,article}}
+        % \file{fdumath-assignment.cls}          {\from{\jobname.dtx}{class,article}}
+        % \file{fdumath-exam.cls}                {\from{\jobname.dtx}{class,article}}
+        % \file{fdumath-thesis.cls}              {\from{\jobname.dtx}{class,article}}
+        % \file{fdumath-book.cls}                {\from{\jobname.dtx}{class,book}}
+        % \file{fdumath-report.cls}              {\from{\jobname.dtx}{class,report}}
+        % \file{fdumath-beamer.cls}              {\from{\jobname.dtx}{class,beamer}}
     \usedir{doc/latex/fdumath}
     \nopreamble\nopostamble
         \file{README.md}                       {\from{\jobname.dtx}{readme}}
   }
 
 
-\obeyspaces
+\catcode32=12\space
 \Msg{*************************************************************}
 \Msg{*                                                           *}
 \Msg{* To finish the installation you have to move the following *}
@@ -106,6 +109,7 @@
 \Msg{*************************************************************}
 
 \endbatchfile
+\endinput
 %% 
 %%
 %% End of file `fdumath.ins'.
