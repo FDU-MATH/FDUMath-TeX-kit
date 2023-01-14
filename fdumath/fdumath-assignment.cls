@@ -1,10 +1,10 @@
 %%
-%% This is file `fdumath-article.cls',
+%% This is file `fdumath-assignment.cls',
 %% generated with the docstrip utility.
 %%
 %% The original source files were:
 %%
-%% fdumath.dtx  (with options: `class,article')
+%% fdumath.dtx  (with options: `class,article,assignment')
 %% 
 %%     Copyright (C) 2022--2023
 %%     School of Mathematical Sciences, Fudan University,
@@ -32,7 +32,7 @@
 \GetIdInfo$Id: fdumath.dtx 1.0 2023-01-14 12:00:00 +0800 Yiyang Wang <maixyoeng@gmail.com> $
   {One of the Class Facilities for SMS&SCMS, Fudan University}
 \LoadClass[12pt, a4paper]{article}
-\ProvidesExplClass{fdumath-article}
+\ProvidesExplClass{fdumath-assignment}
   {\ExplFileDate}{\ExplFileVersion}{\ExplFileDescription}
 \msg_new:nnnn { fdumath } { l3-too-old }
   { Supporting~ package~ `#1'~ too~ old. }
@@ -68,4 +68,4 @@
 %%                                        fdumath-beamer.cls, and
 %%                                        README.md.
 %%
-%% End of file `fdumath-article.cls'.
+%% End of file `fdumath-assignment.cls'.

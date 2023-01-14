@@ -1,5 +1,5 @@
 %%
-%% This is file `fdumath.ins',
+%% This is file `fdumath.ins'
 %%
 %% The original source files were:
 %%     fdumath.dtx  (with options: `install')
@@ -26,9 +26,9 @@
 %% ---------------------------------------------------------------------
 %% 
 
-\input ctxdocstrip %
+\input docstrip %
 \keepsilent
-
+\askforoverwritefalse
 \preamble
 
     Copyright (C) 2022--2023
@@ -70,17 +70,14 @@
 \generate
   {
     \usedir{tex/latex/fdumath}
-        \file{fdumath-article.cls}             {\from{\jobname.dtx}{class,article}}
-        % \file{fdumath-exercise.cls}            {\from{\jobname.dtx}{class,article}}
-        % \file{fdumath-assignment.cls}          {\from{\jobname.dtx}{class,article}}
-        % \file{fdumath-exam.cls}                {\from{\jobname.dtx}{class,article}}
-        % \file{fdumath-thesis.cls}              {\from{\jobname.dtx}{class,article}}
-        % \file{fdumath-book.cls}                {\from{\jobname.dtx}{class,book}}
-        % \file{fdumath-report.cls}              {\from{\jobname.dtx}{class,report}}
-        % \file{fdumath-beamer.cls}              {\from{\jobname.dtx}{class,beamer}}
-    \usedir{doc/latex/fdumath}
-    \nopreamble\nopostamble
-        \file{README.md}                       {\from{\jobname.dtx}{readme}}
+      \file{fdumath-article.cls}             {\from{\jobname.dtx}{class,article}}
+      \file{fdumath-exercise.cls}            {\from{\jobname.dtx}{class,article,exercise}}
+      \file{fdumath-assignment.cls}          {\from{\jobname.dtx}{class,article,assignment}}
+      \file{fdumath-exam.cls}                {\from{\jobname.dtx}{class,article,exam}}
+      \file{fdumath-report.cls}              {\from{\jobname.dtx}{class,report}}
+      \file{fdumath-thesis.cls}              {\from{\jobname.dtx}{class,report,thesis}}
+      \file{fdumath-book.cls}                {\from{\jobname.dtx}{class,book}}
+      \file{fdumath-beamer.cls}              {\from{\jobname.dtx}{class,beamer}}
   }
 
 
@@ -107,9 +104,7 @@
 \Msg{* Happy TeXing!                                             *}
 \Msg{*                                                           *}
 \Msg{*************************************************************}
-
 \endbatchfile
-\endinput
 %% 
 %%
 %% End of file `fdumath.ins'.

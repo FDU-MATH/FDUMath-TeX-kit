@@ -26,58 +26,6 @@
 %<*internal>
 \iffalse
 %</internal>
-%<*readme>
-fdumath
-====
-
-`fdumath` is a collection of macro packages and document classes
-for LaTeX typesetting during study in SMS&SCMS, Fudan University.
-
-Authors and Contributors
-------------------------
-
-* Wang Yiyang <maixyoeng@gmail.com>
-
-Contributing
-------------
-
-This package is a part of the [FDUMath-TeX-kit](https://github.com/FDU-MATH/FDUMath-TeX-kit) project.
-
-Issues and pull requests are welcome.
-
-Copyright and Licence
----------------------
-
-    Copyright (C) 2022--2023
-        School of Mathematical Sciences, Fudan University,
-        Shanghai Center for Mathematical Sciences, Fudan University,
-        and any individual authors listed in the documentation.
-    ----------------------------------------------------------------------
-
-    This work may be distributed and/or modified under the
-    conditions of the LaTeX Project Public License, either
-    version 1.3c of this license or (at your option) any later
-    version. This version of this license is in
-       http://www.latex-project.org/lppl/lppl-1-3c.txt
-    and the latest version of this license is in
-       http://www.latex-project.org/lppl.txt
-    and version 1.3 or later is part of all distributions of
-    LaTeX version 2005/12/01 or later.
-
-    This work has the LPPL maintenance status "maintained".
-
-    This package consists of the files fdumath.dtx,
-                 and the derived files fdumath.ins,
-                                       fdumath-article.cls,
-                                       fdumath-exercise.cls,
-                                       fdumath-assignment.cls,
-                                       fdumath-exam.cls,
-                                       fdumath-thesis.cls,
-                                       fdumath-book.cls,
-                                       fdumath-report.cls,
-                                       fdumath-beamer.cls, and
-                                       README.md (this file).
-%</readme>
 %<*internal>
 \fi
 \begingroup
@@ -87,8 +35,9 @@ Copyright and Licence
 %</internal>
 %<*install>
 
-\input ctxdocstrip %
-
+\input docstrip
+\keepsilent
+\askforoverwritefalse
 \preamble
 
     Copyright (C) 2022--2023
@@ -130,17 +79,14 @@ Copyright and Licence
 \generate
   {
     \usedir{tex/latex/fdumath}
-        \file{fdumath-article.cls}             {\from{\jobname.dtx}{class,article}}
-%%        \file{fdumath-exercise.cls}            {\from{\jobname.dtx}{class,article}}
-%%        \file{fdumath-assignment.cls}          {\from{\jobname.dtx}{class,article}}
-%%        \file{fdumath-exam.cls}                {\from{\jobname.dtx}{class,article}}
-%%        \file{fdumath-thesis.cls}              {\from{\jobname.dtx}{class,article}}
-%%        \file{fdumath-book.cls}                {\from{\jobname.dtx}{class,book}}
-%%        \file{fdumath-report.cls}              {\from{\jobname.dtx}{class,report}}
-%%        \file{fdumath-beamer.cls}              {\from{\jobname.dtx}{class,beamer}}
-    \usedir{doc/latex/fdumath}
-    \nopreamble\nopostamble
-        \file{README.md}                       {\from{\jobname.dtx}{readme}}
+      \file{fdumath-article.cls}             {\from{\jobname.dtx}{class,article}}
+      \file{fdumath-exercise.cls}            {\from{\jobname.dtx}{class,article,exercise}}
+      \file{fdumath-assignment.cls}          {\from{\jobname.dtx}{class,article,assignment}}
+      \file{fdumath-exam.cls}                {\from{\jobname.dtx}{class,article,exam}}
+      \file{fdumath-report.cls}              {\from{\jobname.dtx}{class,report}}
+      \file{fdumath-thesis.cls}              {\from{\jobname.dtx}{class,report,thesis}}
+      \file{fdumath-book.cls}                {\from{\jobname.dtx}{class,book}}
+      \file{fdumath-beamer.cls}              {\from{\jobname.dtx}{class,beamer}}
   }
 
 \catcode32=12\space
@@ -166,25 +112,52 @@ Copyright and Licence
 \Msg{* Happy TeXing!                                             *}
 \Msg{*                                                           *}
 \Msg{*************************************************************}
-
 \endbatchfile
 %</install>
 %<*internal>
 \fi
 %</internal>
+%<*!(driver|readme|install|docstrip)>
+%<class|style>\NeedsTeXFormat{LaTeX2e}
+%<class|style>\RequirePackage{expl3}
+%<class|style>\PassOptionsToPackage{quiet}{fontspec}
+%<+!driver>\GetIdInfo$Id: fdumath.dtx 1.0 2023-01-14 12:00:00 +0800 Yiyang Wang <maixyoeng@gmail.com> $
+%<class>  {One of the Class Facilities for SMS&SCMS, Fudan University}
+%<class&article>\LoadClass[12pt, a4paper]{article}
+%<*class&article>
+%<!(exercise|assignment|exam)>\ProvidesExplClass{fdumath-article}
+%<exercise>\ProvidesExplClass{fdumath-exercise}
+%<assignment>\ProvidesExplClass{fdumath-assignment}
+%<exam>\ProvidesExplClass{fdumath-exam}
+%</class&article>
+%<class&report>\LoadClass[12pt, a4paper]{report}
+%<*class&report>
+%<!thesis>\ProvidesExplClass{fdumath-report}
+%<thesis>\ProvidesExplClass{fdumath-thesis}
+%</class&report>
+%<class&book>\ProvidesExplClass{fdumath-book}
+%<class&beamer>\ProvidesExplClass{fdumath-beamer}
+%<style>  {One of the Style Facilities for SMS&SCMS, Fudan University}
+%<style>\ProvidesExplPackage{\ExplFileName}
+%<!driver>  {\ExplFileDate}{\ExplFileVersion}{\ExplFileDescription}
+%^^A<class|style>\RequirePackage{ctex}
+%</!(driver|readme|install|docstrip)>
 %<*driver>
+\PassOptionsToPackage{quiet}{fontspec}
 \documentclass{ctxdoc}
+\usepackage{paracol} ^^A 多栏比较文本
+\usepackage{framed}
+\usepackage{changepage}
+\setlength\columnsep{2em}
 \begin{document}
+  \EnableImplementation
   \DocInput{\jobname.dtx}
-  \IndexLayout
   \PrintChanges
   \PrintIndex
 \end{document}
 %</driver>
 %
 % \fi
-%
-% \changes{v0.0.1}{2023/01/13}{使用 \LaTeXiii{} 编写此宏集.}
 %
 % \CheckSum{0}
 %
@@ -204,32 +177,158 @@ Copyright and Licence
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-% \GetFileId{fdumath.dtx}
-%
-% \title{\bfseries FDUMath-\TeX{} 手册}
+% \changes{v1.0}{2023/01/13}{Initial version.}
+% \changes{v1.1}{2023/01/14}{Second Day version.}
+% \GetFileInfo{fdumath.dtx}
+% \DoNotIndex{\newcommand,\newenvironment}
+% \title{\bfseries FDUMath-\TeX{}-kit:~\texttt{fdumath}\thanks{\url{https://github.com/FDU-MATH/FDUMath-TeX-kit/tree/main/fdumath}}}
 % \author{SMS \& SCMS, Fudan University}
-% \date{\filedate\qquad\fileversion\thanks{\ctexkitrev{\ExplFileVersion}.}}
+% \date{\today\qquad v1.0}
+% \ctexset{today=old,punct=banjiao}
 % \maketitle
-%
-% \begin{abstract}
-%   Testing
-% \end{abstract}
-%
+% \columnratio{0.45}
+% \begin{paracol}{2}[\vspace{2\baselineskip}]
+%   \switchcolumn[0]
+%     此\texttt{\bfseries fdumath}巨集套件/宏包, 旨在为复旦大学数学科学学院及上海数学中心的师生, 提供便捷的\LaTeX{} 排版接口, 涵盖习题、作业、试卷、报告、论文、课本、幻灯片等日常所需的\texttt{.cls}文件, 适配GB 7713--87 ({\kaishu 科学技术报告、学位论文和学术论文的编写格式}), ISO 690:2010 或 GB/T 7714--2015 ({\kaishu 信息与文献---参考文献著录规则})等中华人民共和国国家标准, 集成标点符号半角转换等支持功能, 并提供各专业方向所需专业符号便捷输入的\texttt{.sty}文件. 以\LaTeX3为主体编写.
+%   \switchcolumn[1]
+%     \noindent Based on \LaTeX3, this \texttt{\bfseries fdumath} macro package facilitates \LaTeX{} typesetting interface for teachers and students at SMS \& SCMS, Fudan University. Included are \texttt{.cls} files for problem sheets, exercise books, exam papers with answer sheets, reports and theses, textbooks, and slides, adapting to national and ISO standards when necessary. Support functions like halfwidth punctuation form conversion are also integrated. In addition, \texttt{.sty} files are furnished for conveniently inputting math symbols of several professional directions.
+% \end{paracol}
+% \begin{paracol}{2}[\vspace{\baselineskip}]
+%   \switchcolumn[0]
+%     本文档以 \href{http://www.latex-project.org/lppl/lppl-1-3c.txt}{LPPL-1.3c} 及其更新协议分发, 本作品现处在``\texttt{维护}''状态. 
+%   \switchcolumn[1]
+%     \noindent This document may be distributed and/or modified under the conditions of \href{http://www.latex-project.org/lppl/lppl-1-3c.txt}{LPPL-1.3c} or (at your option) any later version. This work has the LPPL maintenance status ``\texttt{maintained}''. 
+% \end{paracol}
+% \ctexset{contentsname=目录~(Contents)}
 % \tableofcontents
-%
-% \bigskip
-% \setlength{\parskip}{0.8ex}
-%
-% \begin{documentation}
-% \end{documentation}
-%
-%
+% \pagestyle{plain}
+% \newpage
+%   \section[安装与使用\\ \quad Installation and Usage]{安装与使用 (Installation and Usage)}
+%       Testing.
+%^^A
+%^^A************************************************************************
+%^^A*****************************IMPLEMENTATION*****************************
+%^^A************************************************************************
 % \StopEventually{}
-%
-%
-%\begin{implementation}
+% \begin{implementation}
+%   \section[一般实现\\ \quad General Implementation]{一般实现 (General Implementation)}
+%     \columnratio{0.45}
+%     \begin{paracol}{2}
+%       \switchcolumn[0]
+%         在生成区调用包 \pkg{expl3} 以使用 \LaTeX3.
+%       \switchcolumn[1]
+%         \noindent Invoke \pkg{expl3} at the Generation Part to use \LaTeX3.
+%     \end{paracol}
+%     \begin{framed}\vspace{-0.5\baselineskip}
+%         \begin{verbatim}
+% <...>\NeedsTeXFormat{LaTeX2e}
+% <...>\RequirePackage{expl3}
+% <...>\GetIdInfo$Id: fdumath.dtx <version> <time> <author> $
+% <...>\ProvidesExplXXX{<file_name>}
+%         {\ExplFileDate}{\ExplFileVersion}{\ExplFileDescription}
+%         \end{verbatim}
+%     \vspace{-0.5\baselineskip}\end{framed}
+%^^A
+%     \begin{paracol}{2}
+%       \switchcolumn[0]
+%         \noindent 其中, \texttt{<...>}内是被生成文件的标签 (逗号分开), 例如
+%         \begin{adjustwidth}{0em}{0em}
+%           \begin{itemize}
+%             \item \texttt{<label1\&label2>...}\!指, 将此行内容生成至, 凡同时具有此两个标签的被生成文件; 
+%             \item \texttt{<!(label1\vert label2)>...}\!指, 将此行内容生成至, 凡同时不具有此两个标签的被生成文件;
+%             \item \texttt{<*...>...</...>} 是将中间内容生成至对应规则的文件.
+%           \end{itemize}
+%         \end{adjustwidth}
+%       \switchcolumn[1]
+%         \noindent where, whatever inside \verb|<...>| are the labels for the file to be generated (delimited by comma), e.g.
+%         \begin{adjustwidth}{0em}{0em}
+%           \begin{itemize}
+%             \item \texttt{<label1\&label2>...}\!\, is to include this line to any files with both of these labels; 
+%             \item \texttt{<!(label1\vert label2)>...}\!\, is to include this line to any files without any of these labels;
+%             \item \texttt{<*...>...</...>} is to include contents in the middle to any files according to the previously stated rule.
+%           \end{itemize}
+%         \end{adjustwidth}
+%       \switchcolumn[0]
+%         最后, \texttt{<time>}的格式以下例为准:
+%       \switchcolumn[1]
+%         And finally \verb|<time>| shall be in the form as the following example:
+%     \end{paracol}
+%     \begin{framed}\vspace{-0.5\baselineskip}
+%         \begin{center}\verb|2023-01-14 12:00:00 +0800|\end{center}
+%     \vspace{-0.5\baselineskip}\end{framed}
+%^^A
+%^^A************************************************************************
+%^^A*                          !1: 检查运行环境                              *
+%^^A************************************************************************
+% \subsection{检查运行环境}
+% \begin{paracol}{2}
+% \switchcolumn[0]
+% 用 \verb|<@@=...>| 以将后文的 \verb|@@|替换为指定内容, 同时指示模块.
+% \switchcolumn[1]
+% \noindent Use \verb|<@@=...>| for substitution, indicating a new module.
+% \end{paracol}
+% \begin{framed}
+% \vspace{-0.5\baselineskip}
+%    \begin{macrocode}
+%<@@=fdm>
+%    \end{macrocode}
+% \vspace{-0.5\baselineskip}
+% \end{framed}
+%^^A
+%^^A
+% \begin{paracol}{2}
+% \switchcolumn[0]
+% 检查 \pkg{expl3} 的版本.
+% \switchcolumn[1]
+% \noindent Check the version of \pkg{expl3}.
+% \end{paracol}
+% \begin{framed}
+% \vspace{-0.5\baselineskip}
+%    \begin{macrocode}
+\msg_new:nnnn { fdumath } { l3-too-old }
+  { Supporting~ package~ `#1'~ too~ old. }
+  {
+    Please~ update~ an~ up-to-date~ version~ of~ the~ bundles \\
+    "l3kernel"~ and~ "l3packages".~ Using~ your~ TeX~ package \\
+    manager~ or~ from~ CTAN.
+  }
+\@ifpackagelater { expl3 } { 2021/02/10 } { }
+  { \msg_error:nnn { fdumath } { l3-too-old } { expl3 } }
+%    \end{macrocode}
+% \vspace{-0.5\baselineskip}
+% \end{framed}
+%^^A
+%^^A
+% \begin{variable}{\c_@@_engine_tl,\c_@@_supported_engine_clist}
+% \begin{paracol}{2}
+% \switchcolumn[0]
+% 检查引擎是否为 \XeTeX{} 或 \LuaTeX{}.
+% \switchcolumn[1]
+% \noindent Supported engine types are \XeTeX{} and \LuaTeX{}.
+% \end{paracol}
+% \begin{framed}
+% \vspace{-0.5\baselineskip}
+%    \begin{macrocode}
+\RequirePackage { fix-cm }
+\tl_gset_rescan:Nnx \c_@@_engine_tl {} 
+  { \cs_if_exist:NTF \ngostype { aptex } { \c_sys_engine_str } }
+\clist_const:Nn \c_@@_supported_engine_clist {xetex, luatex}
+\msg_new:nnn { fdumath } { engine-not-supported }
+  {
+    FDUMATH~ Requires~ XeTeX~ or~ LuaTeX. \\\\
+    "#1"~ Not~ Supported~ For~ Now. \\
+    Change~ to~ "XeLaTeX"~ or~ "LuaLaTeX".
+  }
+\clist_if_in:NVF \c_@@_supported_engine_clist \c_@@_engine_tl
+  { \msg_fatal:nnx { fdumath } { engine-not-supported } {\c_@@_engine_tl} }
+%    \end{macrocode}
+% \vspace{-0.5\baselineskip}
+% \end{framed}
+% \end{variable}
+%^^A
+%^^A
 % \end{implementation}
-%
+%^^A
+%^^A
 % \Finale
-%
-\endinput
+% \endinput
