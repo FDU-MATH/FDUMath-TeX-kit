@@ -1,0 +1,1051 @@
+%%
+%% This is file `fdumath-fduthesis-patch.tex'
+%% 
+%%     Copyright (C) 2022--2023
+%%     School of Mathematical Sciences, Fudan University,
+%%     Shanghai Center for Mathematical Sciences, Fudan University,
+%%     and any individual authors listed in the documentation.
+%% ---------------------------------------------------------------------
+%% 
+%%     This work may be distributed and/or modified under the
+%%     conditions of the LaTeX Project Public License, either
+%%     version 1.3c of this license or (at your option) any later
+%%     version. This version of this license is in
+%%        http://www.latex-project.org/lppl/lppl-1-3c.txt
+%%     and the latest version of this license is in
+%%        http://www.latex-project.org/lppl.txt
+%%     and version 1.3 or later is part of all distributions of
+%%     LaTeX version 2005/12/01 or later.
+%% 
+%%     This work has the LPPL maintenance status "maintained".
+%%
+%%*********************************************************************************************************************
+%%*************************************************** IMPLEMENTATION **************************************************
+%%*********************************************************************************************************************
+\NeedsTeXFormat{LaTeX2e}
+\RequirePackage{expl3}
+\PassOptionsToPackage{quiet}{fontspec}
+\GetIdInfo$Id: fdumath-fduthesis-patch.sty 1.0 2023-01-20 12:00:00 +0800 Yiyang Wang <maixyoeng@gmail.com> $
+  {Class Infrastructure for SMS&SCMS, Fudan University}
+\ProvidesExplClass{fdumath-fduthesis-patch}
+  {\ExplFileDate}{}{\ExplFileDescription}
+\RequirePackage{l3keys2e, fdulogo, changepage}
+\RequirePackage{xeCJKfntef}
+%%*********************************************************************************************************************
+%%*************************************************** Infrastructure **************************************************
+%%*********************************************************************************************************************
+% Control Sequences For Initializing New Variables
+\cs_new:Nn \__fdm_ifr_int_init:N
+  { \int_if_exist:NTF #1 { \int_set_eq:NN #1 \c_zero_int } { \int_new:N #1 } }
+\cs_new:Nn \__fdm_ifr_int_ginit:N
+  { \int_if_exist:NTF #1 { \int_gset_eq:NN #1 \c_zero_int } { \int_new:N #1 } }
+\cs_new:Nn \__fdm_ifr_dim_init:N
+  { \dim_zero_new:N #1 }
+\cs_new:Nn \__fdm_ifr_dim_ginit:N
+  { \dim_gzero_new:N #1 }
+\cs_new:Nn \__fdm_ifr_clist_init:N
+  { \clist_if_exist:NTF #1 { \clist_set_eq:NN #1 \c_empty_clist } { \clist_new:N #1 } }
+\cs_new:Nn \__fdm_ifr_clist_ginit:N
+  { \clist_if_exist:NTF #1 { \clist_gset_eq:NN #1 \c_empty_clist } { \clist_new:N #1 } }
+\cs_new:Nn \__fdm_ifr_tl_init:N
+  { \tl_if_exist:NTF #1 { \tl_set:Nn #1 { } } { \tl_new:N #1 } }
+\cs_new:Nn \__fdm_ifr_tl_ginit:N
+  { \tl_if_exist:NTF #1 { \tl_gset:Nn #1 { } } { \tl_new:N #1 } }
+\cs_new:Nn \__fdm_ifr_bool_init:N
+  { \bool_if_exist:NTF #1 { \bool_set_false:N #1 } { \bool_new:N #1 } }
+\cs_new:Nn \__fdm_ifr_bool_ginit:N
+  { \bool_if_exist:NTF #1 { \bool_gset_false:N #1 } { \bool_new:N #1 } }
+\cs_generate_variant:Nn \tl_show:n { x, o }
+\cs_generate_variant:Nn \tl_if_eq:nnTF { xxTF }
+\cs_generate_variant:Nn \tl_if_eq:nnT { xxT }
+\cs_generate_variant:Nn \tl_if_eq:nnF { xxF }
+\cs_generate_variant:Nn \str_if_eq:nnTF { xxTF }
+\cs_generate_variant:Nn \str_if_eq:nnT { xxT }
+\cs_generate_variant:Nn \str_if_eq:nnF { xxF }
+\clist_map_inline:nn { int, dim, clist, tl, bool }
+  {
+    \clist_map_inline:nn { init, ginit }
+      { \cs_generate_variant:cn { __fdm_ifr_#1_##1:N } { c } }
+  }
+
+% New Line
+\cs_new_protected_nopar:Nn \__fdm_ifr_newline:
+  {
+    \newline
+    \begin{minipage}{1ex}\centering\end{minipage}
+  }
+
+% Font Setter Creator
+\NewDocumentCommand \DeclareNewFontSize { m }
+  { \__ctex_save_font_size:nn { #1 } { #1 } }
+\cs_new_protected:Nn \__fdm_ifr_gset_font_setter:nn
+  { \cs_gset_protected_nopar:cn { __fdm_ #1 _font_setter: } { #2 } }
+\cs_generate_variant:Nn \__fdm_ifr_gset_font_setter:nn { xx, nV }
+\cs_new_protected_nopar:Nn \c__fdm_ifr_empty_font_setter: { }
+\cs_new_protected:Nn \__fdm_ifr_gempty_font_setter:n 
+  { \__fdm_ifr_gset_font_setter:nn { #1 } { \c__fdm_ifr_empty_font_setter: } }
+
+% Font Env Setter Creator
+\cs_new_protected:Nn \__fdm_ifr_gset_font_env_setter:nn
+  { \cs_gset_protected:cn { __fdm_ #1 _font_env_setter:n } { \cs_if_exist_use:N #2 { ##1 } } }
+  \cs_generate_variant:Nn \__fdm_ifr_gset_font_env_setter:nn { nV }
+\cs_new_protected:Npn \c__fdm_ifr_empty_font_env_setter:n #1 { #1 }
+\cs_new_protected:Nn \__fdm_ifr_gempty_font_env_setter:n
+  { \__fdm_ifr_gset_font_env_setter:nn { #1 } { \c__fdm_ifr_empty_font_env_setter:n } }
+
+% Dimension Adder Creator
+\cs_new_protected:Nn \__fdm_ifr_create_dim_adder:nn 
+  {
+    \dim_if_exist:cF { g__fdm_ #1 _dim } 
+      {
+        \__fdm_ifr_dim_ginit:c { g__fdm_ #1 _dim }
+        \dim_gset:cn { g__fdm_ #1 _dim } { #2 } % Original Value
+      }
+    \dim_if_exist:cF { g__fdm_ #1 _dim_addition }
+      { \__fdm_ifr_dim_ginit:c { g__fdm_ #1 _dim_addition } }
+    \cs_gset:cn { __fdm_ #1 _dim: }
+      { \dim_eval:n { \dim_use:c { g__fdm_ #1 _dim } + \dim_use:c { g__fdm_ #1 _dim_addition } } }
+  }
+\cs_generate_variant:Nn \__fdm_ifr_create_dim_adder:nn { xx }
+\cs_new_protected:Nn \__fdm_ifr_gzero_dim_adder:n { \dim_gzero:c { g__fdm_ #1 _dim_addition } }
+\cs_new_protected:Nn \__fdm_ifr_gset_dim_adder:nn { \dim_gset:cn { g__fdm_ #1 _dim_addition } { #2 } }
+\cs_generate_variant:Nn \__fdm_ifr_gset_dim_adder:nn { nV }
+\cs_new_protected:Nn \__fdm_ifr_gadd_dim_adder:nn 
+  { 
+    \dim_gset:cn { g__fdm_ #1 _dim_addition }
+      { \dim_use:c { g__fdm_ #1 _dim_addition } + #2 }
+  }
+\cs_generate_variant:Nn \__fdm_ifr_gadd_dim_adder:nn { nV }
+
+% UnPack Protected Control Sequence and Save the Macro Into a Token List
+\cs_new_protected:Nn \__fdm_ifr_unpack_protected_cs_to_tl:NN { \tl_gset:Nx #1 { \tl_head:N #2 \tl_tail:N #2 } }
+
+% Variant For \__fdu_spread_box:nn
+\cs_generate_variant:Nn \__fdu_spread_box:nn { Vn }
+%% Renew Patcher
+\cs_gset_protected:Npn \__fdm_ifr_spread_box:nnn #1#2#3
+  {
+    \mode_leave_vertical:
+    \hbox_to_wd:nn {#1}
+      { \tl_map_inline:xn {#2} { { #3 ##1 } \hfil } \unskip }
+  }
+
+% Renew \__fdu_get_text_width:Nn ( space has 0 width )
+\cs_gset:Npn \__fdu_get_text_width:Nn #1#2
+  {
+    \__fdm_ifr_dim_init:N #1
+    \tl_if_in:nnF { #2 } { \c_space_token }
+      {
+        \hbox_set:Nn \l__fdu_tmpa_box {#2}
+        \dim_set:Nn #1 { \box_wd:N \l__fdu_tmpa_box }
+        % \tl_show:n { #2 }
+        % \dim_show:n { #1 }
+      }
+  }
+\cs_generate_variant:Nn \__fdu_get_text_width:Nn { Nx, cn, cx }
+
+% Renew \__fdu_get_max_text_width:NN
+\cs_gset:Npn \__fdu_get_max_text_width:NN #1#2
+  {
+    \__fdm_ifr_dim_ginit:N #1
+    \group_begin:
+      \clist_set_eq:NN \l__fdu_tmpa_clist #2
+      \bool_until_do:nn { \clist_if_empty_p:N \l__fdu_tmpa_clist }
+        {
+          \clist_pop:NN \l__fdu_tmpa_clist \l__fdu_tmpa_tl
+          \__fdu_get_text_width:NV \l__fdu_tmpa_dim \l__fdu_tmpa_tl
+          \dim_gset:Nn #1 { \dim_max:nn {#1} { \l__fdu_tmpa_dim } }
+        }
+    \group_end:
+  }
+
+% Rows Clist Converts to Columns Clist (Transpose)
+\cs_new:Nn \__fdm_ifr_rows_clist_transpose:Nnn 
+  {
+    \__fdm_ifr_clist_ginit:N #1
+    \group_begin:
+      \__fdm_ifr_clist_init:N \l__fdm_tmpa_clist
+      \int_step_inline:nn { #3 } 
+        {
+          \clist_clear:N \l__fdm_tmpa_clist
+          \clist_map_inline:nn { #2 } 
+            {
+              \int_compare:nTF { ##1 > \clist_count:n { ####1 } }
+                { \clist_put_right:Nn \l__fdm_tmpa_clist { \c_space_token } }
+                { \clist_put_right:Nx \l__fdm_tmpa_clist { \clist_item:nn { ####1 } { ##1 } } }
+            }
+          \clist_gput_right:Nx #1 { { \l__fdm_tmpa_clist } }
+        }
+    \group_end:
+  }
+\cs_generate_variant:Nn \__fdm_ifr_rows_clist_transpose:Nnn { NVn, NnV, NVV }
+\cs_new_protected:Nn \__fdm_ifr_rows_clist_get_column_num:Nn
+  {
+    \__fdm_ifr_int_ginit:N #1
+    \clist_map_inline:nn { #2 }
+      { \int_gset:Nn #1 { \int_max:nn { #1 } { \clist_count:n { ##1 } } } }
+  }
+\cs_generate_variant:Nn \__fdm_ifr_rows_clist_get_column_num:Nn { NV }
+\cs_new:Nn \__fdm_ifr_rows_clist_get_col_num_and_transpose:NNn 
+  {
+    \__fdm_ifr_rows_clist_get_column_num:Nn #1 { #3 }
+    \__fdm_ifr_rows_clist_transpose:NnV #2 { #3 } #1
+  }
+\cs_generate_variant:Nn \__fdm_ifr_rows_clist_get_col_num_and_transpose:NNn  { NNV }
+
+%%*********************************************************************************************************************
+%%************************************************* Edition Raiser ****************************************************
+%%*********************************************************************************************************************
+% Control Sequance For Declaring New Edition
+\__fdm_ifr_clist_ginit:N \g__fdm_thesis_edition_clist
+\clist_gput_left:Nn \g__fdm_thesis_edition_clist { 0 }
+\cs_new_protected:Nn \__fdm_thesis_new_edition:nn
+  { 
+    \clist_gput_left:Nn \g__fdm_thesis_edition_clist { #1 } 
+    \exp_args:NNo \cs_gset_nopar:Nn \__fdm_thesis_edition_raiser_aux: 
+      { \__fdm_thesis_edition_raiser_aux: #2 }
+  }
+
+% Paper Year Key For Edition Raising
+\__fdm_ifr_int_ginit:N \g__fdm_thesis_edition_int
+\__fdm_ifr_int_ginit:N \g__fdm_thesis_paper_year_int
+\keys_define:nn { fdu / info }
+  {
+    date / year .code:n = 
+      {
+        \int_gset:Nn \g__fdm_thesis_paper_year_int { #1 }
+        \tl_gset:Nx \l__fdu_info_date_year_tl { #1 }
+        \__fdm_thesis_edition_confirm_aux:NNN
+          \g__fdm_thesis_edition_int    % [#1] Output
+          \g__fdm_thesis_paper_year_int % [#2] Input
+          \g__fdm_thesis_edition_clist  % [#3] Input
+        \int_compare:nF { \g__fdm_thesis_edition_int == 0 }
+          { \__fdm_thesis_edition_raiser_aux: }
+      },
+    date .initial:n = { \the\year },
+  }
+
+% New Keys For Content Control
+\keys_define:nn { fdu / info }
+  {
+    date / month .tl_set:N = \l__fdu_info_date_month_tl,
+    date / month .initial:n = { \the\month },
+    date / day .tl_set:N = \l__fdu_info_date_day_tl,
+    date / day .initial:n = { \the\day }
+  }
+
+% Dimension Adder Creator With Keys Defining
+\cs_new_protected:Nn \__fdm_thesis_create_dim_adder:nn 
+  {
+    \__fdm_ifr_create_dim_adder:nn { thesis_#1 } { #2 }
+    \keys_define:nn { fdu / FDUMathThesisEditor }
+      {
+        gzeroDimAdder / #1 .value_forbidden:n = true,
+        gzeroDimAdder / #1 .code:n = { \__fdm_ifr_gzero_dim_adder:n { thesis_#1 } },
+        gsetDimAdder  / #1 .code:n = { \__fdm_ifr_gset_dim_adder:nV { thesis_#1 } \l_keys_value_tl },
+        gaddDimAdder  / #1 .code:n = { \__fdm_ifr_gadd_dim_adder:nV { thesis_#1 } \l_keys_value_tl },
+      }
+  }
+
+% Control Sequences and Keys For Edition Raising
+\cs_new_protected:Nn \__fdm_thesis_declare_cover_objects:nnnn
+  {
+    \clist_map_inline:nn { #1 }
+      { 
+        \__fdm_ifr_gset_font_setter:nn     { thesis_info_box }                             {  #2  }
+        \__fdm_ifr_gset_font_setter:nn     { thesis_##1 }                                  {  #2  }
+        \__fdm_ifr_gset_font_setter:nn     { thesis_##1_content }                          {  #3  }
+        \__fdm_ifr_gset_font_env_setter:nn { thesis_##1_content_line }                     {  #4  }
+        \__fdm_thesis_create_dim_adder:nn         { ##1_content_left_blank }               { 0 pt }
+        \__fdm_thesis_create_dim_adder:nn         { ##1_content_line_left_space }          { 0 pt }
+        \__fdm_thesis_create_dim_adder:nn         { ##1_content_line_right_space }         { 0 pt }
+        \bool_if_exist:cF           { g__fdm_thesis_##1_content_flushleft_bool }
+          { \bool_new:c             { g__fdm_thesis_##1_content_flushleft_bool }                  }
+        \tl_if_exist:cF             { g__fdm_thesis_##1_idx_intarray }
+          { \intarray_new:cn        { g__fdm_thesis_##1_idx_intarray } { 2 }                      }
+        \keys_define:nn { fdu / FDUMathThesisEditor / ##1 }
+          { 
+            % Tag Font Setter
+            gemptyTagFontSetter .value_forbidden:n = true,
+            gemptyTagFontSetter .code:n = { \__fdm_ifr_gempty_font_setter:n { thesis_##1 } },
+            gsetTagFontSetter .code:n = { \__fdm_ifr_gset_font_setter:nV  { thesis_##1 } \l_keys_value_tl },
+            % Content Font Setter
+            gemptyContentFontSetter .value_forbidden:n = true,
+            gemptyContentFontSetter .code:n = { \__fdm_ifr_gempty_font_setter:n { thesis_##1_content } },
+            gsetContentFontSetter .code:n = { \__fdm_ifr_gset_font_setter:nV  { thesis_##1_content } \l_keys_value_tl },
+            % Content Line Font Environment Setter
+            gemptyContentLineFontEnvSetter .value_forbidden:n = true,
+            gemptyContentLineFontEnvSetter .code:n = { \__fdm_ifr_gempty_font_env_setter:n { thesis_##1_content_line } },
+            gsetContentLineFontEnvSetter .code:n = { \__fdm_ifr_gset_font_env_setter:nV  { thesis_##1_content_line } \l_keys_value_tl },
+            % Content Left Blank
+            gzeroContentLeftBlankAdder .value_forbidden:n = true,
+            gzeroContentLeftBlankAdder .code:n = { \__fdm_ifr_gzero_dim_adder:n { thesis_##1_content_left_blank } },
+            gsetContentLeftBlankAdder .code:n = { \__fdm_ifr_gset_dim_adder:nV { thesis_##1_content_left_blank } \l_keys_value_tl },
+            gaddContentLeftBlankAdder .code:n = { \__fdm_ifr_gadd_dim_adder:nV { thesis_##1_content_left_blank } \l_keys_value_tl },
+            % Content Line Left Space
+            gzeroContentLineLeftSpaceAdder .value_forbidden:n = true,
+            gzeroContentLineLeftSpaceAdder .code:n = { \__fdm_ifr_gzero_dim_adder:n { thesis_##1_content_line_left_space } },
+            gsetContentLineLeftSpaceAdder .code:n = { \__fdm_ifr_gset_dim_adder:nV { thesis_##1_content_line_left_space } \l_keys_value_tl },
+            gaddContentLineLeftSpaceAdder .code:n = { \__fdm_ifr_gadd_dim_adder:nV { thesis_##1_content_line_left_space } \l_keys_value_tl },
+            % Content Line Right Space
+            gzeroContentLineRightSpaceAdder .value_forbidden:n = true,
+            gzeroContentLineRightSpaceAdder .code:n = { \__fdm_ifr_gzero_dim_adder:n { thesis_##1_content_line_right_space } },
+            gsetContentLineRightSpaceAdder .code:n = { \__fdm_ifr_gset_dim_adder:nV { thesis_##1_content_line_right_space } \l_keys_value_tl },
+            gaddContentLineRightSpaceAdder .code:n = { \__fdm_ifr_gadd_dim_adder:nV { thesis_##1_content_line_right_space } \l_keys_value_tl },
+            % Content Flush Left
+            setContentFlushleft .value_forbidden:n = true,
+            setContentFlushleft .code:n = { \bool_set_true:c { g__fdm_thesis_##1_content_flushleft_bool } },
+            defineContentAux .code:n = { \cs_gset_protected:cx { __fdm_thesis_info_box_##1_content_aux: } { \l_keys_value_tl } }
+          }
+      }
+  }
+\cs_generate_variant:Nn \__fdm_thesis_declare_cover_objects:nnnn { VVVV }
+\cs_new_protected:Nn \__fdm_thesis_declare_cover_objects_aux:n
+  {
+    \__fdm_ifr_clist_init:N \__fdm_tmpa_clist
+    \clist_set:Nn \__fdm_tmpa_clist { #1 }
+    \clist_pop:NN \__fdm_tmpa_clist \g__fdm_thesis_cover_i_objects
+    \clist_pop:NN \__fdm_tmpa_clist \g__fdm_thesis_cover_i_tag_font
+    \clist_pop:NN \__fdm_tmpa_clist \g__fdm_thesis_cover_i_content_font
+    \clist_pop:NN \__fdm_tmpa_clist \g__fdm_thesis_cover_i_content_line_font_env
+    \__fdm_thesis_declare_cover_objects:VVVV
+      \g__fdm_thesis_cover_i_objects
+      \g__fdm_thesis_cover_i_tag_font
+      \g__fdm_thesis_cover_i_content_font
+      \g__fdm_thesis_cover_i_content_line_font_env
+  }
+
+% New Key Module For Edition Raising
+\__fdm_ifr_tl_init:N \l__fdm_thesis_template_name_cover_i
+\tl_set:Nn \l__fdm_thesis_template_name_cover_i { cover-i }
+\keys_define:nn { fdu / FDUMathThesisEditor }
+  {
+    declareFont .code:n =  { \clist_map_inline:nn { #1 } { \DeclareNewFontSize { ##1 } } },
+    editionYear .int_set:N = \l__fdm_thesis_edition_year,
+    editionType .choice:,
+    editionType .value_required:n = true,
+    editionType .choices:nn = { doctor, master, bachelor, graduate, all }
+      { 
+        \__fdm_ifr_tl_init:N \l__fdm_thesis_type
+        \tl_set:Nn \l__fdm_thesis_type { \tl_use:N \l_keys_choice_tl }
+      },
+    % declareCoverIPart Should Be Companied By editionYear and editionType
+    declareCoverIPart .code:n = 
+      { 
+        \tl_set:Nx \l__fdm_thesis_template_name_cover_i
+          { cover-i-\tl_use:N \l__fdm_thesis_type -\romannumeral \l__fdm_thesis_edition_year }
+        \DeclareCoverTemplate { \tl_use:N \l__fdm_thesis_template_name_cover_i } { #1 }
+      },
+    % declareCoverIInstance Should Be Companied By declareCoverIPart
+    declareCoverIInstance .code:n = 
+      { \DeclareInstance { fdu / cover } { cover-i-default } { \tl_use:N \l__fdm_thesis_template_name_cover_i } { #1 } },
+    % editCoverIInstance Can Be Alone
+    editCoverIInstance .code:n = 
+      { \EditInstance    { fdu / cover } { cover-i-default } { \tl_use:N \l__fdm_thesis_template_name_cover_i } { #1 } },
+    declareCoverIObject .code:n = { \__fdm_thesis_declare_cover_objects_aux:n { #1 } },
+    declareCoverIInfoBoxArrange .code:n =
+      {
+        \tl_gset:Nn \g__fdm_thesis_info_box_tags_array { #1 }
+        \__fdm_ifr_rows_clist_get_col_num_and_transpose:NNV
+          \g__fdm_thesis_info_box_col_num_int           % [#1] Output
+          \g__fdm_thesis_info_box_tags_array_transposed % [#2] Output
+          \g__fdm_thesis_info_box_tags_array            % [#3] Input
+        \int_step_inline:nnn { 2 } { \g__fdm_thesis_info_box_col_num_int }
+          {
+            \exp_args:Nx \dim_if_exist:cF { g__fdm_thesis_info_box_col_\romannumeral ##1 _leftedge_rightmove_dim }
+              { \exp_args:Nx \__fdm_thesis_create_dim_adder:nn { info_box_col_\romannumeral ##1 _leftedge_rightmove } { 0pt } }
+          }
+      },
+    createCoverINewObjectInterface .code:n = 
+      {
+        \clist_map_inline:nn { #1 }
+          {
+            \__fdm_ifr_clist_init:N \__fdm_tmpa_clist
+            \clist_set:Nn \__fdm_tmpa_clist { ##1 }
+            \clist_pop:NN \__fdm_tmpa_clist \__fdm_thesis_new_key_interface_name
+            \clist_pop:NN \__fdm_tmpa_clist \__fdm_thesis_new_key_key_name
+            \clist_pop:NN \__fdm_tmpa_clist \__fdm_thesis_new_key_tag_name
+            \tl_if_exist:cF { l__fdu_info_\tl_use:N \__fdm_thesis_new_key_key_name _tl }
+              {
+                \__fdm_ifr_tl_ginit:c { l__fdu_info_\tl_use:N \__fdm_thesis_new_key_key_name _tl }
+                \exp_args:Nno \keys_define:nn { fdu / info }
+                  { \__fdm_thesis_new_key_interface_name .tl_gset:c = { l__fdu_info_\tl_use:N \__fdm_thesis_new_key_key_name _tl } }
+              }
+            \tl_gset_eq:cN { c__fdu_name_\tl_use:N \__fdm_thesis_new_key_key_name _tl } \__fdm_thesis_new_key_tag_name
+          }
+      },
+    contentAux .code:n = { #1 },
+  }
+
+%%*********************************************************************************************************************
+%%************************************************* Edition Raiser ****************************************************
+%%****************************************** (Auxiliary Control Sequences) ********************************************
+%%*********************************************************************************************************************
+\cs_new_protected:Nn \__fdm_thesis_edition_confirm_aux:NNN
+  % \g__fdm_thesis_edition_int    % [#1] Output
+  % \g__fdm_thesis_paper_year_int % [#2] Input
+  % \g__fdm_thesis_edition_clist  % [#3] Input
+  {
+    \group_begin:
+      \__fdm_ifr_clist_init:N \l__fdm_tmpa_clist
+      \clist_set_eq:NN \l__fdm_tmpa_clist #3
+      \__fdm_ifr_bool_init:N \l__fdm_tmpa_bool % False
+      \bool_do_until:nn { \bool_if_p:N \l__fdm_tmpa_bool }
+        {
+          \clist_pop:NN \l__fdm_tmpa_clist \l__fdm_tmpa_tl
+          \__fdm_ifr_int_init:N \l__fdm_tmpa_int
+          \int_set:Nn \l__fdm_tmpa_int { \tl_use:N \l__fdm_tmpa_tl }
+          \int_compare:nNnF { \l__fdm_tmpa_int } > { #2 }
+            { 
+              \int_gset_eq:NN #1 \l__fdm_tmpa_int
+              \bool_set_true:N \l__fdm_tmpa_bool
+            }
+        }
+    \group_end:
+  }
+
+\cs_new_nopar:Nn \__fdm_thesis_edition_raiser_aux: % It Should Be Unprotected
+  {
+    \__fdm_thesis_coveri_id_box_aux:
+    \__fdm_thesis_coveri_type_box_aux:
+    \__fdm_thesis_coveri_info_box_aux:
+  }
+
+\cs_new_protected_nopar:Nn \__fdm_thesis_coveri_id_box_aux:
+  {
+    \tl_gset_eq:NN \c__fdu_name_id_box_student_id_tl   \c__fdu_name_student_id_tl
+    \tl_gset_eq:NN \c__fdu_name_id_box_school_id_tl    \c__fdu_name_school_id_tl
+    \tl_gset_eq:NN \c__fdu_name_id_box_secret_level_tl \c__fdu_name_secret_level_tl
+    \tl_gset:Nn    \c__fdu_name_student_id_tl          { 学号 }
+    \__fdm_ifr_clist_ginit:N \g__fdm_thesis_id_box_clist
+    \__fdm_thesis_declare_cover_objects:nnnn                             % Original Value
+      { student_id, school_id }                                          % Original Value
+      { \c__fdm_ifr_empty_font_setter: }                                 % Original Value
+      { \c__fdm_ifr_empty_font_setter: }                                 % Original Value
+      { \c__fdm_ifr_empty_font_env_setter:n }                            % Original Value
+    \__fdm_thesis_declare_cover_objects:nnnn                             % Original Value
+      { secret_level } { \sffamily } { \sffamily }                       % Original Value
+      { \c__fdm_ifr_empty_font_env_setter:n }                            % Original Value
+    \clist_gset:Nn \g__fdm_thesis_id_box_clist { school_id, student_id } % Original Value
+    \__fdm_thesis_create_dim_adder:nn { id_box } { 120pt }               % Original Value
+    \__fdm_thesis_create_dim_adder:nn { id_box_rightmove } { 20pt }      % Original Value
+    %% Renew FDUTHESIS control sequence
+    \cs_gset_eq:NN \__fdu_cover_id: \__fdm_cover_id:
+  }
+
+\cs_new_protected_nopar:Nn \__fdm_thesis_coveri_type_box_aux:
+  {
+    \__fdm_thesis_create_dim_adder:nn { type_box } {  0.45 \textwidth }  % Original Value
+    %% Renew FDUTHESIS control sequence
+    \cs_gset_eq:NN \__fdu_cover_type: \__fdm_cover_type:
+  }
+
+\cs_new_protected_nopar:Nn \__fdm_thesis_coveri_info_box_aux:
+  { 
+    \bool_if_exist:NF \g__fdm_thesis_info_box_content_compact_bool
+      { \bool_new:N   \g__fdm_thesis_info_box_content_compact_bool }
+    \__fdm_thesis_create_dim_adder:nn { info_box_content_compact_more_blank } { 0 pt }
+    \__fdm_thesis_create_dim_adder:nn { info_box_leftedge_rightmove }         { 0 pt }
+    \__fdm_thesis_create_dim_adder:nn { info_box_rightedge_rightmove }        { 0 pt }
+    \__fdm_ifr_gset_font_setter:nn { thesis_info_box } { \centering }            % Original Value
+    \__fdm_ifr_clist_ginit:N \g__fdm_thesis_info_box_tags_array
+    \int_case:nn { \l__fdu_info_degree_type_int } 
+      {
+        { 1 }
+        {
+          \tl_gset:Nn \g__fdm_thesis_info_box_tags_array
+            { department, major, author, supervisor, date }                      % Original Value
+        }
+        { 2 }
+        {
+          \tl_gset:Nn \g__fdm_thesis_info_box_tags_array
+            { department, major_professional, author, supervisor, date }         % Original Value
+        }
+      }
+    \__fdm_thesis_create_dim_adder:nn { info_box_tags } { 0em }                  % Original Value
+    \__fdm_thesis_create_dim_adder:nn { info_box_line_skip } { 1ex }             % Original Value
+    \__fdm_thesis_create_dim_adder:nn 
+      { info_box_multiline_content_line_skip } { 0.2 \baselineskip }             % Original Value
+    \__fdm_thesis_declare_cover_objects:nnnn                                     % Original Value
+      { department, major, major_professional, author, supervisor, date, colon } % Original Value
+      { \zihao { 4 } }                                                           % Original Value
+      { \zihao { 4 } }                                                           % Original Value
+      { \c__fdm_ifr_empty_font_env_setter:n }                                    % Original Value
+    \dim_gset:Nn \g__fdm_thesis_info_box_leftedge_rightmove_dim { 7.2 pt }
+    \dim_gset:Nn \g__fdm_thesis_info_box_rightedge_rightmove_dim { - 3.6 pt }
+    \__fdm_ifr_dim_ginit:N \g__fdm_thesis_info_box_textwidth
+    \dim_gset:Nn \g__fdm_thesis_info_box_textwidth
+      { 
+        \dim_eval:n
+          {
+            \textwidth
+            - \__fdm_thesis_info_box_leftedge_rightmove_dim:
+            + \__fdm_thesis_info_box_rightedge_rightmove_dim:
+          }
+      }
+    %% Renew FDUTHESIS control sequence
+    \cs_gset_eq:NN \__fdu_cover_info: \__fdm_cover_info:
+  }
+    
+%% Renewer **********************************************************************************
+\cs_gset:Npn \__fdm_cover_id_aux:n #1
+  {
+    {
+      \cs_if_exist_use:c { __fdm_thesis_ #1 _font_setter: }
+      \tl_use:c { c__fdu_name_id_box_ #1 _tl }
+      \c__fdu_fwid_colon_tl
+    }
+    {
+      \cs_if_exist_use:c { __fdm_thesis_ #1 _content_font_setter: }
+      \tl_use:c { l__fdu_info_ #1 _tl }
+    }
+  }
+
+\cs_gset_protected_nopar:Nn \__fdm_cover_id: 
+  {
+    \__fdu_fixed_width_box:nn { \g__fdm_thesis_id_box_dim + \g__fdm_thesis_id_box_dim_addition } 
+      {
+        \bool_if:NT \l__fdu_secret_bool 
+          {
+            \__fdm_cover_id_aux:n { secret_level }
+            {
+              \cs_if_exist_use:N \__fdm_thesis_secret_level_content_font_setter:
+              \c__fdu_name_secret_star_tl
+              \l__fdu_info_secret_year_tl
+            }
+            \par
+          }
+        \clist_map_inline:Nn \g__fdm_thesis_id_box_clist
+          { \par \__fdm_cover_id_aux:n { ##1 } }
+      }
+    \hbox_to_wd:nn { - \g__fdm_thesis_id_box_rightmove_dim - \g__fdm_thesis_id_box_rightmove_dim_addition } { }
+  }
+
+\cs_gset_protected_nopar:Nn \__fdm_cover_type: 
+  {
+    \mode_leave_vertical:
+    \__fdu_get_text_width:Nn \g__fdm_thesis_type_box_dim
+      { \clist_item:Nn \c__fdu_thesis_type_clist { \g__fdu_thesis_type_int } }
+    \__fdu_spread_box:nn { \g__fdm_thesis_type_box_dim + \g__fdm_thesis_type_box_dim_addition }
+      { \clist_item:Nn \c__fdu_thesis_type_clist { \g__fdu_thesis_type_int } }
+  }
+
+\cs_gset_protected_nopar:Nn \__fdm_cover_info: 
+  {
+    \__fdm_thesis_multicol_info_box_calc_dims_aux:
+    \begin{adjustwidth}
+      { \__fdm_thesis_info_box_leftedge_rightmove_dim: }
+      { \__fdm_thesis_info_box_rightedge_rightmove_dim: }
+      \begin{minipage} [ c ] { \g__fdm_thesis_info_box_textwidth }
+        \cs_if_exist_use:N \__fdm_thesis_info_box_font_setter:
+        \__fdm_ifr_clist_init:N \l__fdm_tmpa_clist
+        \clist_gset_eq:NN \l__fdm_tmpa_clist \g__fdm_thesis_info_box_tags_array
+        \bool_until_do:nn { \clist_if_empty_p:N \l__fdm_tmpa_clist }
+          {
+            \clist_pop:NN \l__fdm_tmpa_clist \l__fdm_tmpa_tl
+            \__fdm_thesis_multicol_info_box_row_output_aux:N \l__fdm_tmpa_tl
+            \skip_vertical:n { \g__fdm_thesis_info_box_line_skip_dim + \g__fdm_thesis_info_box_line_skip_dim_addition }
+          }
+      \end{minipage}
+    \end{adjustwidth}
+  }
+%% Auxiliary ********************************************************************************
+\cs_new:Nn \__fdm_thesis_onecolumn_info_box_tag_output_aux:nn
+  {
+    \__fdm_ifr_spread_box:nnn { #2 } { \tl_use:c { c__fdu_name_ #1 _tl } }
+      { \cs_if_exist_use:c { __fdm_thesis_ #1 _font_setter: } }
+    { \cs_if_exist_use:c { __fdm_thesis_colon_font_setter: } \c__fdu_fwid_colon_tl }
+  }
+\cs_generate_variant:Nn \__fdm_thesis_onecolumn_info_box_tag_output_aux:nn { nV, Vn, VV }
+\cs_new:Nn \__fdm_thesis_multicol_info_box_end_index_aux:NNN
+  % \l__fdu_tmpb_int    % End Column Index            % [#1] Output and Input
+  % \l__fdu_tmpa_clist  % Clist Start From Next Index % [#2] Input
+  % \l__fdu_tmpa_tl     % This Index TL               % [#3] Input
+  {
+    \group_begin:
+      \__fdm_ifr_tl_init:N \l__fdm_tmpc_tl % It Has To Be TMPC
+      \clist_if_empty:NF #2
+        {
+          \clist_pop:NN #2 \l__fdm_tmpc_tl
+          \tl_if_eq:xxT { #3 } { \l__fdm_tmpc_tl }
+            {
+              \int_gincr:N #1
+              \__fdm_thesis_multicol_info_box_end_index_aux:NNN #1 #2 #3
+            }
+        }
+    \group_end:
+  }
+\cs_new_protected_nopar:Nn \__fdm_thesis_multicol_info_box_determine_start_end_idx:
+  {
+    \group_begin:
+      \__fdm_ifr_clist_init:N \l__fdm_tmpa_clist
+      \clist_gset_eq:NN \l__fdm_tmpa_clist \g__fdm_thesis_info_box_tags_array
+      \bool_until_do:nn { \clist_if_empty_p:N \l__fdm_tmpa_clist }
+        {
+          \clist_pop:NN \l__fdm_tmpa_clist \l__fdm_tmpb_clist
+          \__fdm_ifr_int_init:N \l__fdm_tmpa_int % Column Index Start
+          \__fdm_ifr_int_init:N \l__fdm_tmpb_int % Column Index End
+          \__fdm_ifr_int_init:N \l__fdm_tmpc_int % Column Index Now At
+          \int_incr:N           \l__fdm_tmpa_int % Initial at One
+          \int_incr:N           \l__fdm_tmpb_int % Initial at One
+          \int_incr:N           \l__fdm_tmpc_int % Initial at One
+          \bool_until_do:nn { \clist_if_empty_p:N \l__fdm_tmpb_clist }
+            {
+              \clist_pop:NN \l__fdm_tmpb_clist \l__fdm_tmpb_tl
+              \int_compare:nNnF { \l__fdm_tmpc_int } < { \l__fdm_tmpa_int }
+                {
+                  \tl_if_in:NnF \l__fdm_tmpb_tl { \c_space_token } 
+                    {
+                      \__fdm_thesis_multicol_info_box_end_index_aux:NNN
+                        \l__fdm_tmpb_int    % End Column Index            % [#1] Output and Input
+                        \l__fdm_tmpb_clist  % Clist Start From Next Index % [#2] Input
+                        \l__fdm_tmpb_tl     % This Index TL               % [#3] Input
+                      \intarray_gset:cnn 
+                        { g__fdm_thesis_\tl_use:N \l__fdm_tmpb_tl _idx_intarray }
+                        { 1 } { \int_use:N \l__fdm_tmpa_int }
+                      \intarray_gset:cnn
+                        { g__fdm_thesis_\tl_use:N \l__fdm_tmpb_tl _idx_intarray }
+                        { 2 } { \int_use:N \l__fdm_tmpb_int }
+                    }
+                  \int_incr:N \l__fdm_tmpb_int
+                  \int_set_eq:NN \l__fdm_tmpa_int \l__fdm_tmpb_int
+                }
+              \int_incr:N \l__fdm_tmpc_int
+            }
+        }
+    \group_end:
+  }
+\cs_new_protected:Nn \__fdm_thesis_multicol_info_box_determine_tags_dim_aux:N
+  {
+    \fp_set:Nn \l_tmpa { \fparray_item:Nn #1 { 1 } }
+    \int_step_inline:nnn { 2 } { \fparray_count:N #1 }
+      {
+        \fp_compare:nNnT { \l_tmpa } < { \fparray_item:Nn #1 { ##1 } }
+          { \fp_set:Nn \l_tmpa { \fparray_item:Nn #1 { ##1 } } }
+      }
+    \int_step_inline:nn { \fparray_count:N #1 } { \fparray_gset:Nnn #1 { ##1 } { \l_tmpa } }
+  }
+\cs_new_protected_nopar:Nn \__fdm_thesis_multicol_info_box_calc_dims_aux:
+  % To Calculate The Dimensions Below:
+  % \g__fdm_thesis_info_box_tags_dim_fparray
+  % \g__fdm_thesis_info_box_contents_dim_fparray
+  % \g__fdm_thesis_info_box_content_line_dim_fparray
+  % \g__fdm_thesis_info_box_colon_dim
+  {
+    \__fdm_thesis_multicol_info_box_determine_start_end_idx:
+    \__fdu_get_text_width:Nx \g__fdm_thesis_info_box_colon_dim  % Output
+      { \cs_if_exist_use:N \__fdm_thesis_colon_font_setter: \c__fdu_fwid_colon_tl }
+    \fparray_new:Nn \g__fdm_thesis_info_box_tags_dim_fparray         { \g__fdm_thesis_info_box_col_num_int }
+    \fparray_new:Nn \g__fdm_thesis_info_box_contents_dim_fparray     { \g__fdm_thesis_info_box_col_num_int }
+    \fparray_new:Nn \g__fdm_thesis_info_box_content_line_dim_fparray { \g__fdm_thesis_info_box_col_num_int }
+    \group_begin:
+      \int_step_inline:nn { \g__fdm_thesis_info_box_col_num_int }
+        {
+          \__fdm_ifr_clist_init:N \l__fdm_tmpa_clist
+          \__fdm_ifr_clist_init:N \l__fdm_tmpb_clist
+          \__fdm_ifr_clist_init:N \l__fdm_tmpc_clist
+          \clist_set:Nx \l__fdm_tmpa_clist 
+            { \clist_item:Nn \g__fdm_thesis_info_box_tags_array_transposed { ##1 } }
+          \clist_map_inline:Nn \l__fdm_tmpa_clist % For Each Item In This Column
+            { 
+              \tl_if_in:nnTF { ####1 } { \c_space_token }
+              { 
+                \clist_put_right:Nn \l__fdm_tmpb_clist { \c_space_token } 
+                \clist_put_right:Nn \l__fdm_tmpc_clist { \c_space_token } 
+              }
+              {
+                \bool_if:nTF
+                  {
+                    \int_compare_p:nNn { ##1 } = { \intarray_item:cn { g__fdm_thesis_ ####1 _idx_intarray } { 1 } }
+                    &&
+                    \int_compare_p:nNn { \intarray_item:cn { g__fdm_thesis_ ####1 _idx_intarray } { 1 } } =
+                      { \intarray_item:cn { g__fdm_thesis_ ####1 _idx_intarray } { 2 } }
+                  }
+                  {
+                    \clist_put_right:Nn \l__fdm_tmpb_clist
+                      { { 
+                        \cs_if_exist_use:c { __fdm_thesis_ ####1 _font_setter: }
+                        \tl_use:c { c__fdu_name_ ####1 _tl } 
+                      } }
+                    \clist_put_right:Nn \l__fdm_tmpc_clist
+                      { { 
+                        \__fdm_thesis_multicol_info_box_content_text_output_aux:n { ####1 }
+                      } }
+                  }
+                  {
+                    \clist_put_right:Nn \l__fdm_tmpb_clist { \c_space_token } 
+                    \clist_put_right:Nn \l__fdm_tmpc_clist { \c_space_token } 
+                  }
+              }
+            }
+          \__fdu_get_max_text_width:NN \l__fdm_tmpa_dim \l__fdm_tmpb_clist
+          \fparray_gset:Nnn \g__fdm_thesis_info_box_tags_dim_fparray { ##1 } { \dim_to_decimal:n \l__fdm_tmpa_dim }
+          \__fdu_get_max_text_width:NN \l__fdm_tmpa_dim \l__fdm_tmpc_clist
+          \fparray_gset:Nnn \g__fdm_thesis_info_box_contents_dim_fparray { ##1 } { \dim_to_decimal:n \l__fdm_tmpa_dim }
+        }
+      \__fdm_thesis_multicol_info_box_determine_tags_dim_aux:N \g__fdm_thesis_info_box_tags_dim_fparray
+      \bool_if:NTF \g__fdm_thesis_info_box_content_compact_bool
+        {
+          \int_step_inline:nn { \g__fdm_thesis_info_box_col_num_int }
+            {
+              \fparray_gset:Nnn \g__fdm_thesis_info_box_content_line_dim_fparray { ##1 } 
+              { 
+                \fparray_item:Nn \g__fdm_thesis_info_box_contents_dim_fparray { ##1 } 
+                + \dim_to_decimal:n 
+                  {
+                    \g__fdm_thesis_info_box_content_compact_more_blank_dim
+                    + \g__fdm_thesis_info_box_content_compact_more_blank_dim_addition
+                  }
+              }
+            }
+        }
+        {
+          \int_step_inline:nn { \g__fdm_thesis_info_box_col_num_int }
+            {
+              \__fdm_ifr_tl_init:N  \l__fdm_thesis_this_col_num_tl
+              \__fdm_ifr_int_init:N \l__fdm_thesis_next_col_num
+              \__fdm_ifr_tl_init:N  \l__fdm_thesis_next_col_num_tl
+              \tl_set:Nn  \l__fdm_thesis_this_col_num_tl { \romannumeral ##1 }
+              \int_set:Nn \l__fdm_thesis_next_col_num    { ##1 + 1 }
+              \tl_set:Nn  \l__fdm_thesis_next_col_num_tl { \romannumeral \l__fdm_thesis_next_col_num }
+              \dim_if_exist:cTF { g__fdm_thesis_info_box_col_\tl_use:N \l__fdm_thesis_this_col_num_tl _leftedge_rightmove_dim }
+                {
+                  \dim_if_exist:cTF { g__fdm_thesis_info_box_col_\tl_use:N \l__fdm_thesis_next_col_num_tl _leftedge_rightmove_dim }
+                  {
+                    \fparray_gset:Nnn \g__fdm_thesis_info_box_content_line_dim_fparray { ##1 }
+                      {
+                        \dim_to_decimal:n
+                          {
+                            \fp_eval:n { 1 / \int_use:N \g__fdm_thesis_info_box_col_num_int } \g__fdm_thesis_info_box_textwidth
+                            - \fp_to_dim:n { \fparray_item:Nn \g__fdm_thesis_info_box_tags_dim_fparray { ##1 }}
+                            - \g__fdm_thesis_info_box_colon_dim
+                            - \dim_use:c { g__fdm_thesis_info_box_col_\tl_use:N \l__fdm_thesis_this_col_num_tl _leftedge_rightmove_dim }
+                            - \dim_use:c { g__fdm_thesis_info_box_col_\tl_use:N \l__fdm_thesis_this_col_num_tl _leftedge_rightmove_dim_addition }
+                            + \dim_use:c { g__fdm_thesis_info_box_col_\tl_use:N \l__fdm_thesis_next_col_num_tl _leftedge_rightmove_dim }
+                            + \dim_use:c { g__fdm_thesis_info_box_col_\tl_use:N \l__fdm_thesis_next_col_num_tl _leftedge_rightmove_dim_addition }
+                          }
+                      }
+                  }
+                  {
+                    \fparray_gset:Nnn \g__fdm_thesis_info_box_content_line_dim_fparray { ##1 }
+                      {
+                        \dim_to_decimal:n
+                          {
+                            \fp_eval:n { 1 / \int_use:N \g__fdm_thesis_info_box_col_num_int } \g__fdm_thesis_info_box_textwidth
+                            - \fp_to_dim:n { \fparray_item:Nn \g__fdm_thesis_info_box_tags_dim_fparray { ##1 }}
+                            - \g__fdm_thesis_info_box_colon_dim
+                            - \dim_use:c { g__fdm_thesis_info_box_col_\tl_use:N \l__fdm_thesis_this_col_num_tl _leftedge_rightmove_dim }
+                            - \dim_use:c { g__fdm_thesis_info_box_col_\tl_use:N \l__fdm_thesis_this_col_num_tl _leftedge_rightmove_dim_addition }
+                          }
+                      }
+                  }
+                }
+                {
+                  \int_compare:nNnTF { \g__fdm_thesis_info_box_col_num_int } = { 1 }
+                    {
+                      \fparray_gset:Nnn \g__fdm_thesis_info_box_content_line_dim_fparray { ##1 }
+                        {
+                          \dim_to_decimal:n
+                            {
+                              \fp_eval:n { 1 / \int_use:N \g__fdm_thesis_info_box_col_num_int } \g__fdm_thesis_info_box_textwidth
+                              - \fp_to_dim:n { \fparray_item:Nn \g__fdm_thesis_info_box_tags_dim_fparray { ##1 } }
+                              - \g__fdm_thesis_info_box_colon_dim
+                            }
+                        }
+                    }
+                    {
+                      \fparray_gset:Nnn \g__fdm_thesis_info_box_content_line_dim_fparray { ##1 }
+                        {
+                          \dim_to_decimal:n
+                            {
+                              \fp_eval:n { 1 / \int_use:N \g__fdm_thesis_info_box_col_num_int } \g__fdm_thesis_info_box_textwidth
+                              - \fp_to_dim:n { \fparray_item:Nn \g__fdm_thesis_info_box_tags_dim_fparray { ##1 } }
+                              - \g__fdm_thesis_info_box_colon_dim
+                              + \g__fdm_thesis_info_box_col_ii_leftedge_rightmove_dim
+                              + \g__fdm_thesis_info_box_col_ii_leftedge_rightmove_dim_addition
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    \group_end:
+  }
+\cs_new:Nn \__fdm_thesis_multicol_info_box_row_output_aux:N
+  % \l__fdu_tmpa_tl % [#1] Input
+  {
+    \group_begin:
+      \__fdm_ifr_clist_init:N \l__fdm_tmpa_clist
+      \clist_set_eq:NN \l__fdm_tmpa_clist #1
+      \__fdm_ifr_int_init:N \l__fdm_tmpa_int % Column Index Start
+      \__fdm_ifr_int_init:N \l__fdm_tmpc_int % Column Index Now At
+      \int_incr:N           \l__fdm_tmpa_int % Initial at One
+      \int_incr:N           \l__fdm_tmpc_int % Initial at One
+      \bool_until_do:nn { \clist_if_empty_p:N \l__fdm_tmpa_clist }
+        {
+          \clist_pop:NN \l__fdm_tmpa_clist \l__fdm_tmpa_tl
+          \int_compare:nNnF { \l__fdm_tmpc_int } < { \l__fdm_tmpa_int }
+            {
+              \tl_if_in:NnTF \l__fdm_tmpa_tl { \c_space_token } 
+                { 
+                  \__fdu_center_box:nn
+                    {
+                      \fp_to_dim:n { \fparray_item:Nn \g__fdm_thesis_info_box_tags_dim_fparray { \l__fdm_tmpa_int } }
+                      + \g__fdm_thesis_info_box_colon_dim 
+                      + \fp_to_dim:n { \fparray_item:Nn \g__fdm_thesis_info_box_content_line_dim_fparray { \l__fdm_tmpa_int } }
+                    }{}
+                  \int_incr:N \l__fdm_tmpa_int
+                }
+                {
+                  \__fdm_thesis_onecolumn_info_box_tag_output_aux:Vn \l__fdm_tmpa_tl
+                    { \fp_to_dim:n { \fparray_item:Nn \g__fdm_thesis_info_box_tags_dim_fparray { \l__fdm_tmpa_int } } }
+                  \__fdm_thesis_multicol_info_box_content_output_aux:N \l__fdm_tmpa_tl
+                  \int_set:Nn \l__fdm_tmpa_int { 1 + \intarray_item:cn { g__fdm_thesis_\tl_use:N \l__fdm_tmpa_tl _idx_intarray } { 2 } }
+                }
+            }
+          \int_incr:N \l__fdm_tmpc_int
+        }
+    \group_end:
+  }
+\cs_new:Nn \__fdm_thesis_multicol_info_box_content_output_aux:N
+  % \l__fdm_tmpa_tl  % This Index TL % [#1] Input
+  {
+    \group_begin:
+      \__fdu_get_text_width:cn
+        { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim }
+        { \__fdm_thesis_multicol_info_box_content_text_output_aux:n { \tl_use:N #1 } }
+      \__fdm_ifr_dim_init:N \l__fdm_tmpa_dim
+      \int_step_inline:nnn 
+        { \intarray_item:cn { g__fdm_thesis_\tl_use:N #1 _idx_intarray } { 1 } }
+        { \intarray_item:cn { g__fdm_thesis_\tl_use:N #1 _idx_intarray } { 2 } }
+        {
+          \dim_set:Nn \l__fdm_tmpa_dim
+            {
+              \l__fdm_tmpa_dim
+              + \fp_to_dim:n { \fparray_item:Nn \g__fdm_thesis_info_box_content_line_dim_fparray { ##1 } } 
+            }
+          \int_compare:nNnT { ##1 } < { \intarray_item:cn { g__fdm_thesis_\tl_use:N #1 _idx_intarray } { 2 } }
+            {
+              \dim_set:Nn \l__fdm_tmpa_dim
+                {
+                  \l__fdm_tmpa_dim
+                  + \fp_to_dim:n { \fparray_item:Nn \g__fdm_thesis_info_box_tags_dim_fparray { ##1 + 1 } } 
+                  + \g__fdm_thesis_info_box_colon_dim
+                }
+            }
+        }
+      \dim_compare:nNnTF { \l__fdm_tmpa_dim } < { \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim } }
+        {
+          \parbox [ t ] { \l__fdm_tmpa_dim }
+            { \__fdm_thesis_multicol_info_box_content_text_output_aux:n { \tl_use:N #1 } }
+          \skip_vertical:n 
+            { 
+              \g__fdm_thesis_info_box_multiline_content_line_skip_dim
+              + \g__fdm_thesis_info_box_multiline_content_line_skip_dim_addition
+            }
+        }
+        {
+          \dim_gset:cn { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim }
+            {
+              ( 
+                \l__fdm_tmpa_dim
+                - \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim }
+              ) / 2
+            }
+          \hbox_to_wd:nn { \dim_use:N \l__fdm_tmpa_dim }
+            {
+              \hspace{
+                \dim_eval:n
+                  {
+                    \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_line_left_space_dim }
+                    + \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_line_left_space_dim_addition }
+                  }
+              }
+              {
+                \cs_if_exist_use:c { __fdm_thesis_ \tl_use:N #1 _content_font_setter: }
+                \cs_if_exist_use:c { __fdm_thesis_ \tl_use:N #1 _content_line_font_env_setter:n }
+                  {
+                    \bool_if:cTF { g__fdm_thesis_ \tl_use:N #1 _content_flushleft_bool }
+                      { 
+                        \hspace{
+                          \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim_addition }
+                        }
+                        \__fdm_thesis_multicol_info_box_content_text_output_aux:n { \tl_use:N #1 } 
+                        \hspace{
+                          \dim_eval:n
+                            {
+                                \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim } 
+                              - \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim_addition }
+                              + \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim } 
+                              - \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_line_left_space_dim }
+                              - \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_line_left_space_dim_addition }
+                              - \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_line_right_space_dim }
+                              - \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_line_right_space_dim_addition }
+                            }
+                        }
+                      }
+                      {
+                        \hspace{
+                          \dim_eval:n
+                            {
+                              \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim } 
+                              + \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim_addition }
+                              - \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_line_left_space_dim }
+                              - \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_line_left_space_dim_addition }
+                            }
+                        }
+                        \__fdm_thesis_multicol_info_box_content_text_output_aux:n { \tl_use:N #1 }
+                        \hspace{
+                          \dim_eval:n
+                            {
+                              \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim } 
+                              - \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim_addition }
+                              - \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_line_right_space_dim }
+                              - \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_line_right_space_dim_addition }
+                            }
+                        }
+                      }
+                  }
+              }
+              \hspace{
+                \dim_eval:n
+                  {
+                    \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_line_right_space_dim }
+                    + \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_line_right_space_dim_addition }
+                  }
+              }
+            }
+        }
+    \group_end:
+  }
+\cs_new_protected:Nn \__fdm_thesis_multicol_info_box_content_text_output_aux:n
+  { {
+    \raggedright \raggedbottom
+    \cs_if_exist_use:c { __fdm_thesis_ #1 _content_font_setter: }
+    \cs_if_exist_use:cF { __fdm_thesis_info_box_ #1 _content_aux: }
+      { \tl_use:c { l__fdu_info_ #1 _tl } }
+  } }
+
+%%*********************************************************************************************************************
+%%**************************************************** Edition 2019 ***************************************************
+%%*********************************************************************************************************************
+\__fdm_thesis_new_edition:nn { 2019 } 
+  {
+    \int_compare:nNnF { 2019 } > { \g__fdm_thesis_edition_int }
+      {
+        % Only Bachelor
+        \int_compare:nT { \g__fdu_thesis_type_int == 3} 
+          {
+            \keys_set:nn { fdu / FDUMathThesisEditor }
+              {
+                declareFont = { 35pt },
+                editionYear = { 2019 },
+                editionType = { bachelor },
+                declareCoverIPart = { logo, type, emblem, info },
+                declareCoverIInstance = 
+                  {
+                    format             = \__fdu_line_spread:N \c__fdu_line_spread_fp,
+                    logo   / content   = \__fdu_cover_logo:,
+                    type   / content   = \__fdu_cover_type:,
+                    emblem / content   = { \resizebox{5cm}{!}{ \__fdulogo_tikz:nx { \fdulogo@emblem@new } { \c__fdulogo_default_arg_tl } } },
+                    info   / content   = \__fdu_cover_info:,
+                    type   / format    = \zihao{35pt}\sffamily,
+                    logo   / align     = center,
+                    type   / align     = center,
+                    emblem / align     = center,
+                    info   / align     = left,
+                  },
+                declareCoverIObject = 
+                  {
+                    { title, author, student_id, department, major, supervisor, supervisor_title, supervisor_unit, date },
+                    { \zihao{-3}\sffamily },
+                    { \zihao{-3}\rmfamily },
+                    { \CJKunderline }
+                  },
+                declareCoverIInfoBoxArrange = 
+                  { 
+                    { title,            title            }, 
+                    { author,           student_id       }, 
+                    { department,       department       },
+                    { major,            major            }, 
+                    { supervisor,       supervisor_title }, 
+                    { supervisor_unit,  supervisor_unit  }, 
+                    { date,             date             }  
+                  },
+                date         / gemptyContentLineFontEnvSetter,
+                author       / gsetContentLineRightSpaceAdder       = { 5pt },
+                supervisor   / gsetContentLineRightSpaceAdder       = { 5pt }, 
+                gsetDimAdder / info_box_col_ii_leftedge_rightmove   = { 2em },
+                gsetDimAdder / info_box_multiline_content_line_skip = { 0.3 \baselineskip }, % (1.3 - 1)
+                createCoverINewObjectInterface = 
+                  {
+                    { supervisor-title, supervisor_title, 职称    },
+                    { supervisor-unit,  supervisor_unit,  单位    },
+                    { title,            title,            论文题目 }
+                  },
+                title / defineContentAux =
+                  {
+                    \__fdm_thesis_title_content_line_font_env_setter:n
+                      { \exp_not:N \l__fdu_info_title_tl \hfill }
+                    \__fdm_ifr_newline:
+                  },
+                date / defineContentAux =
+                  {
+                    { \cs_if_exist_use:N \__fdm_thesis_date_font_setter: \exp_not:N \l__fdu_info_date_year_tl }
+                    { \cs_if_exist_use:N \__fdm_thesis_date_font_setter: 年 }
+                    \__fdu_center_box:nn { 2\exp_not:N \g__fdm_thesis_info_box_colon_dim }
+                      { \cs_if_exist_use:N \__fdm_thesis_date_content_font_setter: \exp_not:N \l__fdu_info_date_month_tl }
+                    { \cs_if_exist_use:N \__fdm_thesis_date_font_setter: 月 }
+                    \__fdu_center_box:nn { 2\exp_not:N \g__fdm_thesis_info_box_colon_dim }
+                      { \cs_if_exist_use:N \__fdm_thesis_date_content_font_setter: \exp_not:N \l__fdu_info_date_day_tl }
+                    { \cs_if_exist_use:N \__fdm_thesis_date_font_setter: 日 }
+                  },
+                contentAux = 
+                  {
+                    \str_case_e:nn { \g__fdu_cjk_fontset_tl } {
+                      { mac }    { \__fdm_ifr_gset_dim_adder:nn { thesis_type_box } { 0.5em } }
+                      { fandol } { \__fdm_ifr_gset_dim_adder:nn { thesis_type_box } { 0.8em } }
+                    }
+                  }
+              }
+          }
+      }
+  }
+
+%%*********************************************************************************************************************
+%%**************************************************** Edition 2021 ***************************************************
+%%*********************************************************************************************************************
+\__fdm_thesis_new_edition:nn { 2021 } 
+  {
+    \int_compare:nNnF { 2021 } > { \g__fdm_thesis_edition_int }
+      {
+        % Only Bachelor
+        \int_compare:nT { \g__fdu_thesis_type_int == 3} 
+          {
+            \keys_set:nn { fdu / FDUMathThesisEditor }
+              {
+                declareCoverIObject = 
+                  {
+                    { title, author, student_id, department, major, supervisor, supervisor_title, supervisor_unit, date },
+                    { \zihao{-3}\sffamily },
+                    { \zihao{-3}\rmfamily },
+                    { \c__fdm_ifr_empty_font_env_setter:n }
+                  },
+                declareCoverIInfoBoxArrange = 
+                  { 
+                    { title,            title            }, 
+                    { author,           student_id       }, 
+                    { department                         },
+                    { major                              }, 
+                    { supervisor,       supervisor_title }, 
+                    { supervisor_unit                    }, 
+                    { date,             date             }  
+                  },
+                date / gsetContentLeftBlankAdder = { -37.5bp },
+              }
+          }
+      }
+  }
+
+%%
+%% End of file `fdumath-fduthesis-patch'.
