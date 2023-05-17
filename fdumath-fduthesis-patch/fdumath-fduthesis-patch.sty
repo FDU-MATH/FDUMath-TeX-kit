@@ -23,9 +23,13 @@
 %%*************************************************** IMPLEMENTATION **************************************************
 %%*********************************************************************************************************************
 \NeedsTeXFormat{LaTeX2e}
+%%%%% 2023-04-11
+\renewcommand{\thepage}{}
+\setcounter{page}{0}
+%%%%% 2023-04-11
 \RequirePackage{expl3}
 \PassOptionsToPackage{quiet}{fontspec}
-\GetIdInfo$Id: fdumath-fduthesis-patch.sty 1.0 2023-01-20 12:00:00 +0800 Yiyang Wang <maixyoeng@gmail.com> $
+\GetIdInfo$Id: fdumath-fduthesis-patch.sty 1.1 2023-04-11 12:00:00 +0800 Yiyang Wang <maixyoeng@gmail.com> $
   {Class Infrastructure for SMS&SCMS, Fudan University}
 \ProvidesExplClass{fdumath-fduthesis-patch}
   {\ExplFileDate}{}{\ExplFileDescription}
@@ -954,6 +958,7 @@
                     type   / align     = center,
                     emblem / align     = center,
                     info   / align     = left,
+                    emblem / bottom-skip = 50pt,
                   },
                 declareCoverIObject = 
                   {
@@ -981,7 +986,9 @@
                   {
                     { supervisor-title, supervisor_title, 职称    },
                     { supervisor-unit,  supervisor_unit,  单位    },
-                    { title,            title,            论文题目 }
+                    { title,            title,            论文题目 },
+                    { title-breakline,  title_breakline,  论文题目 },
+                    { keywords-english, keywords_english, Keywords}
                   },
                 title / defineContentAux =
                   {
@@ -1008,44 +1015,140 @@
                     }
                   }
               }
-          }
-      }
-  }
-
-%%*********************************************************************************************************************
-%%**************************************************** Edition 2021 ***************************************************
-%%*********************************************************************************************************************
-\__fdm_thesis_new_edition:nn { 2021 } 
-  {
-    \int_compare:nNnF { 2021 } > { \g__fdm_thesis_edition_int }
-      {
-        % Only Bachelor
-        \int_compare:nT { \g__fdu_thesis_type_int == 3} 
-          {
-            \keys_set:nn { fdu / FDUMathThesisEditor }
+            \geometry{a4paper,hmargin={2.54cm,2.54cm},vmargin={3.17cm,3.17cm}}
+            \usepackage[pdfborder={0 0 0},colorlinks=true,linkcolor=blue,CJKbookmarks=true]{hyperref}
+            \@openrightfalse
+            \let\cleardoublepage\clearpage
+            \fdu_hyperref_setup:n
               {
-                declareCoverIObject = 
-                  {
-                    { title, author, student_id, department, major, supervisor, supervisor_title, supervisor_unit, date },
-                    { \zihao{-3}\sffamily },
-                    { \zihao{-3}\rmfamily },
-                    { \c__fdm_ifr_empty_font_env_setter:n }
-                  },
-                declareCoverIInfoBoxArrange = 
-                  { 
-                    { title,            title            }, 
-                    { author,           student_id       }, 
-                    { department                         },
-                    { major                              }, 
-                    { supervisor,       supervisor_title }, 
-                    { supervisor_unit                    }, 
-                    { date,             date             }  
-                  },
-                date / gsetContentLeftBlankAdder = { -37.5bp },
+                linkcolor = blue,
+                citecolor = blue,
               }
+            % \RenewDocumentCommand \headrulewidth { } { 0 pt }
+            \renewcommand{\@pnumwidth}{2.5em}
+            \renewcommand{\@tocrmarg}{3em}
+            \RenewDocumentCommand \makecoveriii { } { }
+            \ctexset{
+              chapter = {
+                nameformat={\zihao{3}\sffamily},%
+                titleformat={\zihao{3}\sffamily},%
+                beforeskip={0.8cm},afterskip={1.2cm}
+              },
+              section = {
+                nameformat={\zihao{-3}\sffamily\centering},%
+                titleformat={\zihao{-3}\sffamily\centering},%
+                name={第~,~节},number={\arabic{section}},%
+                beforeskip={1.5\baselineskip},afterskip={\baselineskip}
+              },
+              subsection = {
+                format={\zihao{-4}\sffamily\raggedright},%
+                titleformat={\zihao{-4}\sffamily\raggedright},%
+                number={\arabic{section}.\arabic{subsection}.},%
+                beforeskip={0.4cm},afterskip={0.4cm}
+              }
+            }
           }
       }
   }
+\newcommand{\makeTableOfContentsAndTitle}{
+  \title{\sffamily \tl_use:N\l__fdu_info_title_breakline_tl}
+  \author{
+    \tl_use:N\l__fdu_info_author_tl\\ \quad\\
+    \clist_gset:Nn \l__fdm_title_page_tags_clist { student_id, major, supervisor }
+    \__fdm_ifr_clist_init:N \l__fdm_title_page_clist
+    \clist_map_inline:Nn \l__fdm_title_page_tags_clist {
+      \clist_put_right:Nn \l__fdm_title_page_clist {
+        { \cs_if_exist_use:c { __fdm_thesis_ ####1 _font_setter: } \tl_use:c { c__fdu_name_ ####1 _tl } }
+        { \cs_if_exist_use:c { __fdm_thesis_colon_font_setter: } \c__fdu_fwid_colon_tl }
+      }
+    }
+    \__fdm_ifr_clist_init:N \l__fdm_title_page_value_clist
+    \clist_map_inline:Nn \l__fdm_title_page_tags_clist { \clist_put_right:Nn \l__fdm_title_page_value_clist 
+      { \tl_use:c { l__fdu_info_ ####1 _tl } } 
+    }
+    \__fdu_get_max_text_width:NN \l__fdm_title_page_info_width \l__fdm_title_page_clist
+    \__fdu_get_max_text_width:NN \l__fdm_title_page_info_value_width \l__fdm_title_page_value_clist
+    \clist_map_inline:Nn \l__fdm_title_page_tags_clist {
+      \__fdm_thesis_onecolumn_info_box_tag_output_aux:nn { ####1 }{ \l__fdm_title_page_info_width }\quad
+      \hbox_to_wd:nn { \l__fdm_title_page_info_value_width }{ 
+        \hfil \tl_use:c { l__fdu_info_ ####1 _tl } \hfil
+      }\\
+    }
+    \quad
+  }
+  \date{}
+  \renewcommand{\thepage}{\roman{page}}
+  \pagestyle{plain}
+  \setcounter{page}{1}
+  \tableofcontents
+  \clearpage
 
+  \renewenvironment{titlepage}
+  {%
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \else
+      \@restonecolfalse\newpage
+    \fi
+    \thispagestyle{empty}%
+  }
+  {%
+    \if@restonecol
+      \twocolumn
+    \else
+      \newpage
+    \fi
+  }
+  \maketitle
+  \thispagestyle{empty}
+  \clearpage
+  \renewcommand{\thepage}{\Roman{page}}
+  \setcounter{page}{1}
+}
+\newcommand{\takeCareOfPageNumbers}{
+  \renewcommand{\thepage}{}
+}
+\newcommand{\makeTableOfContents}{
+  \pagestyle{plain}
+  \tableofcontents
+}
+\newcommand{\changeToEnglishAbstract}{
+  \tl_gset:Nn \c__fdu_name_abstract_tl { {\fontfamily{lmr}\selectfont\textbf{Abstract}} }
+  \tl_gset:Nn \c__fdu_name_keywords_tl { {\fontfamily{lmr}\selectfont\textbf{Keywords}} }
+  \clist_gset_eq:NN \l__fdu_info_keywords_clist \l__fdu_info_keywords_english_tl
+  \tl_gset:Nn \c__fdu_fwid_semicolon_tl {,}
+}
+\newcommand{\startMainPart}{
+  \clearpage
+  \renewcommand{\thepage}{\arabic{page}}
+  \setcounter{page}{1}
+  \pagestyle{plain}
+}
 %%
 %% End of file `fdumath-fduthesis-patch'.
+
+\RequirePackage{anyfontsize}
+\RequirePackage{multicol}
+\RequirePackage{framed}
+\RequirePackage{paralist}
+	\let\itemize\compactitem
+	\let\enditemize\endcompactitem
+	\let\enumerate\compactenum
+	\let\endenumerate\endcompactenum
+	\let\description\compactdesc
+	\let\enddescription\endcompactdesc
+% \RequirePackage{amsmath} 
+\RequirePackage{amsfonts}
+\RequirePackage{amssymb}
+\RequirePackage{amsthm} % 
+	% \theoremstyle{plain/definition/remark}
+\RequirePackage{bm} % 
+\RequirePackage{extarrows}
+\RequirePackage{mathrsfs}
+\RequirePackage{esint} % 
+\RequirePackage{nicematrix} % 
+\RequirePackage{cancel} % 
+\allowdisplaybreaks[4] % 
+\RequirePackage{siunitx} % 
+%
+\let\kaishu\fdu@kai
