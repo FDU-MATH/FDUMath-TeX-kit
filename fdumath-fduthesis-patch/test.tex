@@ -32,12 +32,12 @@
 \def\theequation{\arabic{chapter}.\arabic{equation}}
 \def\thedefinition{\arabic{chapter}.\arabic{definition}}
 
-% \usepackage{pdfpages} % 到时候用来添加封面二和封面三
+% 到时候用来添加封面二和封面三
 % \renewcommand{\makecoverii}{\includepdf[pages={1}]{coverii.pdf}}
 % \renewcommand{\makecoveriii}{\includepdf[pages={1}]{coveriii.pdf}}
 
 \begin{document}
-  \takeCareOfPageNumbers % 修改的内容1
+  \takeCareOfPageNumbers
 
   \begin{abstract}
     这是摘要.
@@ -48,7 +48,7 @@
     This is abstract.
   \end{abstract}
 
-  \makeTableOfContents % 修改的内容2
+  \makeTableOfContents
 
   \startMainPart
   \chapter{这是章}
