@@ -1,9 +1,8 @@
 \PassOptionsToPackage{quiet}{fontspec}
-\documentclass[oneside]{fduthesis2023}
-\usepackage{fdumath-fduthesis-patch}
+\documentclass[oneside]{fdmthesis2023}
 \fdusetup{
   style = {
-    % fullwidth-stop    =  mapping,
+    % fullwidth-stop    =  mapping, % 中文全角句点向全角化英文半角句点的映射
     hyperlink-color   =  classic,
   },
   info = {
@@ -22,13 +21,16 @@
   },
 }
 
-\newtheorem{definition}{定义}[chapter]
-\newtheorem{theorem}[definition]{定理}
-\newtheorem{axiom}[definition]{公理}
-\newtheorem{lemma}[definition]{引理}
-\newtheorem{proposition}[definition]{命题}
-\newtheorem{corollary}[definition]{推论}
-\newtheorem{remark}{注}[chapter]
+\theoremstyle{definition}
+  \newtheorem{definition}{定义}[chapter]
+\theoremstyle{plain}
+  \newtheorem{theorem}[definition]{定理}
+  \newtheorem{axiom}[definition]{公理}
+  \newtheorem{lemma}[definition]{引理}
+  \newtheorem{proposition}[definition]{命题}
+  \newtheorem{corollary}[definition]{推论}
+\theoremstyle{remark}
+  \newtheorem{remark}{注}[chapter]
 \def\theequation{\arabic{chapter}.\arabic{equation}}
 \def\thedefinition{\arabic{chapter}.\arabic{definition}}
 
@@ -37,41 +39,38 @@
 % \renewcommand{\makecoveriii}{\includepdf[pages={1}]{coveriii.pdf}}
 
 \begin{document}
-  \takeCareOfPageNumbers
+  \frontmatter
+    \begin{abstract}
+      这是摘要.
+    \end{abstract}
 
-  \begin{abstract}
-    这是摘要.
-  \end{abstract}
-  
-  \changeToEnglishAbstract
-  \begin{abstract}
-    This is abstract.
-  \end{abstract}
+    \begin{abstract*}
+      This is abstract.
+    \end{abstract*}
 
-  \makeTableOfContents
+    % \maketitle
+    \tableofcontents
 
-  \startMainPart
-  \chapter{这是章}
-    \section{这是节}
-      \subsection{这是小节}
-        这是正文.
-        $$
-          f(x)=\int_{\Omega}\mathscr{A}f(g)\,\mathrm{d}\mu(\omega)
-        $$
-        \newpage
-        这是第二页的正文.
-        \begin{proof}
-          Proof Ends Here.
-        \end{proof}
+  \mainmatter
+    \chapter{这是章}
+      \section{这是节}
+        \subsection{这是小节}
+          这是正文.
+          $$
+            f(x)=\int_{\Omega}\mathscr{A}f(g)\,\mathrm{d}\mu(\omega)
+          $$
+          \newpage
+          这是第二页的正文.
+          \begin{proof}
+            Proof Ends Here.
+          \end{proof}
 
   \backmatter
-  \chapter*{致谢}
-  \addcontentsline{toc}{chapter}{\textbf{致谢}}
-  \renewcommand{\thepage}{}
-    这是致谢.
+    \begin{acknowledgement}
+      这是致谢.
+    \end{acknowledgement}
 
-  \clearpage
-  \phantomsection\addcontentsline{toc}{chapter}{\textbf{参考文献}}
-  % \bibliographystyle{unsrt}
-  % \bibliography{}
+    \phantomsection\addcontentsline{toc}{chapter}{\textbf{参考文献}}
+      \bibliographystyle{unsrt}
+      \bibliography{test}
 \end{document} 
