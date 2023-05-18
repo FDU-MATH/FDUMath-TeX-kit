@@ -2769,8 +2769,7 @@
                   },
                 title / defineContentAux =
                   {
-                    \__fdm_thesis_title_content_line_font_env_setter:n
-                      { \exp_not:N \l__fdu_info_title_tl \hfill }
+                    { \__fdm_thesis_title_content_font_setter: \exp_not:N \l__fdu_info_title_tl \hfill }
                     \__fdm_ifr_newline:
                   },
                 date / defineContentAux =
