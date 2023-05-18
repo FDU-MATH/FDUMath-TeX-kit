@@ -1,3 +1,5 @@
+% 请按如下顺序编译：xelatex->xelatex
+% 在含有BibTeX时，请按如下顺序编译：xelatex->bibtex->xelatex->xelatex
 \PassOptionsToPackage{quiet}{fontspec}
 \documentclass[oneside]{fdmthesis2023}
 \fdusetup{
@@ -48,19 +50,22 @@
       This is abstract.
     \end{abstract*}
 
-    % \maketitle
+    \maketitle
     \tableofcontents
 
   \mainmatter
     \chapter{这是章}
       \section{这是节}
         \subsection{这是小节}
-          这是正文.
+          这是正文. \cite{key}
           $$
             f(x)=\int_{\Omega}\mathscr{A}f(g)\,\mathrm{d}\mu(\omega)
           $$
           \newpage
           这是第二页的正文.
+          \begin{proposition}[命题标题]\kaiti
+            命题内容. Contents of the Proposition.
+          \end{proposition}
           \begin{proof}
             Proof Ends Here.
           \end{proof}
@@ -70,7 +75,10 @@
       这是致谢.
     \end{acknowledgement}
 
-    \phantomsection\addcontentsline{toc}{chapter}{\textbf{参考文献}}
+    \phantomsection\addcontentsline{toc}{chapter}{参考文献}
       \bibliographystyle{unsrt}
       \bibliography{test}
+
+    \chapter*{附录A\quad 部分证明}
+    \addcontentsline{toc}{chapter}{\heiti 附录A\quad 部分证明}
 \end{document} 

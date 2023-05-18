@@ -2843,7 +2843,7 @@
             }
           \RenewDocumentEnvironment { abstract* } { }
             { 
-              \tl_gset:Nn \c__fdu_name_abstract_en_tl { {\fontfamily{lmr}\selectfont\textbf{Abstract}} }
+              \tl_gset:Nn \c__fdu_name_abstract_en_tl { {\fontfamily{lmr}\selectfont\textbf{Abstract} } }
               \__fdu_abstract_en_begin: 
             } 
             { 
@@ -2917,7 +2917,8 @@
 %
 \let\kaishu\fdu@kai
 \let\kaiti\fdu@kai
-\let\heiti\bfseries
+\def\heiti{\sffamily\mdseries}
+\renewcommand{\proofname}{{\kaishu 证明}}
 \renewcommand{\c__fdu_fwid_colon_tl}{：}
 \renewcommand{\c__fdu_fwid_semicolon_tl}{；}
 \RequirePackage{pdfpages} %
