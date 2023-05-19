@@ -2040,6 +2040,8 @@
         \__fdm_thesis_create_dim_adder:nn         { ##1_content_left_blank }               { 0 pt }
         \__fdm_thesis_create_dim_adder:nn         { ##1_content_line_left_space }          { 0 pt }
         \__fdm_thesis_create_dim_adder:nn         { ##1_content_line_right_space }         { 0 pt }
+        \bool_if_exist:cF           { g__fdm_thesis_##1_content_overOneLine_bool }
+          { \bool_new:c             { g__fdm_thesis_##1_content_overOneLine_bool } } % Default False
         \bool_if_exist:cF           { g__fdm_thesis_##1_content_flushleft_bool }
           { \bool_new:c             { g__fdm_thesis_##1_content_flushleft_bool }                  }
         \tl_if_exist:cF             { g__fdm_thesis_##1_idx_intarray }
@@ -2618,7 +2620,10 @@
       \dim_compare:nNnTF { \l__fdm_tmpa_dim } < { \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim } }
         {
           \parbox [ t ] { \l__fdm_tmpa_dim }
-            { \__fdm_thesis_multicol_info_box_content_text_output_aux:n { \tl_use:N #1 } }
+            { 
+              \bool_gset_true:c { g__fdm_thesis_ \tl_use:N #1 _content_overOneLine_bool }
+              \__fdm_thesis_multicol_info_box_content_text_output_aux:n { \tl_use:N #1 } 
+            }
           \skip_vertical:n 
             { 
               \g__fdm_thesis_info_box_multiline_content_line_skip_dim
@@ -2651,6 +2656,7 @@
                         \hspace{
                           \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_left_blank_dim_addition }
                         }
+                        % \bool_gset_false:c { g__fdm_thesis_ \tl_use:N #1 _content_overOneLine_bool }
                         \__fdm_thesis_multicol_info_box_content_text_output_aux:n { \tl_use:N #1 } 
                         \hspace{
                           \dim_eval:n
@@ -2675,6 +2681,7 @@
                               - \dim_use:c { g__fdm_thesis_ \tl_use:N #1 _content_line_left_space_dim_addition }
                             }
                         }
+                        % \bool_gset_false:c { g__fdm_thesis_ \tl_use:N #1 _content_overOneLine_bool }
                         \__fdm_thesis_multicol_info_box_content_text_output_aux:n { \tl_use:N #1 }
                         \hspace{
                           \dim_eval:n
@@ -2702,9 +2709,11 @@
 \cs_new_protected:Nn \__fdm_thesis_multicol_info_box_content_text_output_aux:n
   { {
     \raggedright \raggedbottom
-    \cs_if_exist_use:c { __fdm_thesis_ #1 _content_font_setter: }
     \cs_if_exist_use:cF { __fdm_thesis_info_box_ #1 _content_aux: }
-      { \tl_use:c { l__fdu_info_ #1 _tl } }
+      { 
+        \cs_if_exist_use:c { __fdm_thesis_ #1 _content_font_setter: }
+        \tl_use:c { l__fdu_info_ #1 _tl } 
+      }
   } }
 
 %%*********************************************************************************************************************
@@ -2739,10 +2748,17 @@
                   },
                 declareCoverIObject = 
                   {
-                    { title, author, student_id, department, major, supervisor, supervisor_title, supervisor_unit, date },
+                    { title, author, student_id, department, major, supervisor, supervisor_title, supervisor_unit },
                     { \zihao{-3}\sffamily },
                     { \zihao{-3}\rmfamily },
                     { \CJKunderline }
+                  },
+                declareCoverIObject =
+                  {
+                    { date },
+                    { \zihao{-3}\sffamily },
+                    { \zihao{-3}\rmfamily },
+                    {  }
                   },
                 declareCoverIInfoBoxArrange = 
                   { 
@@ -2769,8 +2785,17 @@
                   },
                 title / defineContentAux =
                   {
-                    { \__fdm_thesis_title_content_font_setter: \exp_not:N \l__fdu_info_title_tl \hfill }
-                    \__fdm_ifr_newline:
+                    \exp_not:N \bool_if:NTF \g__fdm_thesis_title_content_overOneLine_bool
+                      {
+                        \__fdm_thesis_title_content_font_setter: 
+                        \__fdm_thesis_title_content_line_font_env_setter:n
+                          { \exp_not:N \l__fdu_info_title_tl \hfill }
+                        \__fdm_ifr_newline:
+                      }
+                      {
+                        { \exp_not:N \l__fdu_info_title_tl \hfill }
+                        \__fdm_ifr_newline:
+                      }
                   },
                 date / defineContentAux =
                   {
